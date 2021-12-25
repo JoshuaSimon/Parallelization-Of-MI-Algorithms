@@ -27,22 +27,22 @@ workload <- function(i) {
 
 #' A wrapper function, which performs a parallel execution of 
 #' a passed function on the passed number of threads for the
-#' passed number of iterations. 
+#' passed number of iterations. This function also handels the
+#' registration of an OS specific parallel backend and its
+#' lifetime. 
 #' 
 #' @param func A fuction, which is suited for execution in a parallel for
 #' loop and takes only one integer as input arguments
 #' @param num_threads The number of threads, which will be created
 #' @param max_iter The maximum number of parallel iterations
 #' @return A vector with the results of \code{func}.
-parallel_worker <- function(func, num_threads, max_iter) {
-    # Register a parallel execution on your system. 
-    # Depending on the OS, a different parallel backend is used.
-    # This step sets everything up to create a number of R 
-    # processes where the parallel fuction call is distributed to. 
-    if (Sys.info()[["sysname"]] == "Windows") {
+parallel_worker <- function(func, num_threads, max_iter) { 
+    os_name <- Sys.info()[["sysname"]] 
+    
+    if (os_name == "Windows") {
         cl <- parallel::makeCluster(num_threads)
         doParallel::registerDoParallel(cl)
-    } else if (Sys.info()[["sysname"]] %in% c("Darwin", "Linux")) {
+    } else if (os_name %in% c("Darwin", "Linux")) {
         doMC::registerDoMC(num_threads)
     }
 
@@ -53,7 +53,7 @@ parallel_worker <- function(func, num_threads, max_iter) {
     }
         
     # Stop the parallel cluster after the execution has finished.
-    if (Sys.info()[["sysname"]] == "Windows") {
+    if (os_name == "Windows") {
         parallel::stopCluster(cl)
     }
 
