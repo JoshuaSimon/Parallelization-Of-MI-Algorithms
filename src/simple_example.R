@@ -45,7 +45,7 @@ parallel_worker <- function(func, num_threads, max_iter) {
     } else if (os_name %in% c("Darwin", "Linux")) {
         doMC::registerDoMC(num_threads)
     }
-
+#HI Eva was here
     # Call a parallel foreach loop, that execute
     # the workload in parallel.
     result <- foreach::foreach(i=1:max_iter, .combine=c) %dopar% {
