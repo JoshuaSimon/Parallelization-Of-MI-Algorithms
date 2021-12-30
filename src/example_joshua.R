@@ -16,7 +16,7 @@ library(doParallel)
 
 
 data(SLID)
-names(SLID_test) <- c("einkommen", "bildung", "alter", "geschlecht", "sprache")
+names(SLID) <- c("einkommen", "bildung", "alter", "geschlecht", "sprache")
 
 max_imp <- 100
 steps <- 10
