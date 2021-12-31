@@ -59,7 +59,7 @@ systparl[i] <- system.time(resultparl[[i]] <- parlmice(data=dat, m=R[i], predict
 #run time parlmice
 
 systpar[i] <- system.time(resultpar[[i]] <- micemd::mice.par(don.na=dat, m=R[i], predictorMatrix = pred, print = F))[3]
-#runtime parmice, not available on Windows?
+#runtime micemd::mice.par()
 }
 
 #Runtime Visualization
