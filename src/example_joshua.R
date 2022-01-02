@@ -57,6 +57,7 @@ benmark_imputations <- function(data, imp_runs) {
   par_runtimes <- numeric(length(imp_runs))
   par_mice_runtimes <- numeric(length(imp_runs))
   par_mice_runtimes_md <- numeric(length(imp_runs))
+  #data <- SLID
 
   for (i in 1:length(imp_runs)) {
     seed = 1
@@ -144,7 +145,7 @@ benmark_plot <- function(runtime_data) {
 }
 
 
-benmark_run <- function(test_mode = 1) {
+benmark_run <- function(test_data, test_mode = 1) {
   # Choose the number of impuations which are 
   # calculated in the benchmark. 
   if (test_mode == 1) {
@@ -161,16 +162,9 @@ benmark_run <- function(test_mode = 1) {
     stop("This is not implemented.")
   }
 
-  # Load up some test data. 
-  sim_data <- generate_sim_data(n = 10000, seed = 42)
-  data(SLID)
-  names(SLID) <- c("einkommen", "bildung", "alter", "geschlecht", "sprache")
-
-  test_data <- list(sim_data, SLID)
-  plots <- vector(mode = "list", length = length(test_data))
-
   # Run the benchmark on all test data sets. The plot results
   # are saved. 
+  plots <- vector(mode = "list", length = length(test_data))
   for (i in 1:length(test_data)) {
      plots[[i]] <- benmark_imputations(data = test_data[[i]], imp_runs = imp_runs) %>% benmark_plot()
   }
@@ -179,12 +173,29 @@ benmark_run <- function(test_mode = 1) {
 }
 
 
-plots <- benmark_run(test_mode = 1)
+# Load up some test data. 
+data(SLID)
+names(SLID) <- c("einkommen", "bildung", "alter", "geschlecht", "sprache")
+
+test_data <- list(SLID)
+plots <- benmark_run(test_mode = 1, test_data)
+plots[[1]]
+
+
+# Test the impact of different data sizes.
+test_data <- list(generate_sim_data(n = 100, seed = 42),
+                 generate_sim_data(n = 1000, seed = 42),
+                 generate_sim_data(n = 10000, seed = 42),
+                 generate_sim_data(n = 100000, seed = 42))
+plots <- benmark_run(test_mode = 1, test_data)
 plots[[1]]
 plots[[2]]
+plots[[3]]
+plots[[4]]
+
 
 # For some weird reason parlmice does not work with passed 
 # arguments within a function scope. Hence, one must test it 
 # outside in the global scope.
-   system.time(parlmice(data = SLID, m = 16, cluster.seed = 1,
-             n.core = 16, n.imp.core = 1, maxit = 2))
+system.time(parlmice(data = SLID, m = 16, cluster.seed = 1,
+            n.core = 16, n.imp.core = 1, maxit = 2))
