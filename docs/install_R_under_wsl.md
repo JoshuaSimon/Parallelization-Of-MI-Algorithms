@@ -57,6 +57,7 @@ Open an interactive R Session by typing `sudo R`. Root access is needed to write
 - Change directory: `cd <path>` (You can use relative paths inside your current directory!) 
 - Go back to parent directory `cd ..` 
 - Go to previous directory `cd -`
+- Create a new directory `mkdir <foldername>`
 - Start an interactive R session: `R` (use `quit()` within R to close the session)
 - Run an R script form the terminal: `Rscript <filename>` for example `Rscript src/simple_example.R`
 - Interrupt the process of a running command (keyboard interrupt): `CRTL + C` (this works also inside an interactive R session)
