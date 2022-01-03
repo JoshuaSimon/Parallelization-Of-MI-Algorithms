@@ -96,13 +96,13 @@ benmark_imputations <- function(data, imp_runs) {
     
     
     # Parallel run with built-in mice function.
-    time_start_par_mice <- Sys.time()
-    parlmice(data = data, m = num_imp, cluster.seed = seed,
-             n.core = num_cores, n.imp.core = ceiling(num_imp/num_cores), maxit = 2)
-    time_end_par_mice <- Sys.time()
-    time_taken_par_mice <- difftime(time_end_par_mice, time_start_par_mice, units = "secs")
-    par_mice_runtimes[i] <- as.numeric(time_taken_par_mice)
-    print(paste0("Runtime in parallel execution (parlmice) is ", time_taken_par_mice, " seconds."))
+    #time_start_par_mice <- Sys.time()
+    #parlmice(data = data, m = num_imp, cluster.seed = seed,
+    #         n.core = num_cores, n.imp.core = ceiling(num_imp/num_cores), maxit = 2)
+    #time_end_par_mice <- Sys.time()
+    #time_taken_par_mice <- difftime(time_end_par_mice, time_start_par_mice, units = "secs")
+    #par_mice_runtimes[i] <- as.numeric(time_taken_par_mice)
+    #print(paste0("Runtime in parallel execution (parlmice) is ", time_taken_par_mice, " seconds."))
 
     # Parallel run with parallel mice function from micemd package.
     time_start_par_mice_md <- Sys.time()
@@ -121,7 +121,7 @@ benmark_imputations <- function(data, imp_runs) {
 # Create a plot displaying als the runtimes as cruves
 # for the different MI implementations. 
 # Returns a ggplot object.
-benmark_plot <- function(runtime_data) {
+benmark_plot <- function(runtime_data, imp_runs) {
   plot <- ggplot(data = runtime_data, aes(imp_runs, seq_runtimes)) +
     geom_point(color = "red") +
     geom_point(aes(imp_runs, par_runtimes), color = "blue") +
@@ -166,7 +166,7 @@ benmark_run <- function(test_data, test_mode = 1) {
   # are saved. 
   plots <- vector(mode = "list", length = length(test_data))
   for (i in 1:length(test_data)) {
-     plots[[i]] <- benmark_imputations(data = test_data[[i]], imp_runs = imp_runs) %>% benmark_plot()
+     plots[[i]] <- benmark_imputations(data = test_data[[i]], imp_runs = imp_runs) %>% benmark_plot(runtime_data = ., imp_runs = imp_runs)
   }
   
   return(plots)
