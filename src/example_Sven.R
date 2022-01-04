@@ -16,12 +16,16 @@ dataGenerator <- function(n = 10000, p_mis = 0.25){
   x_2 <- 5 - 0.7 * x_1 + rnorm(n, 0, 4)
   # x_3 depending on the values of x_1 und x_2
   x_3 <- 5 + 0.5 * x_1 + 0.3 * x_2 + rnorm(n, 0, 2)
+  # x_4 depending on values of x_1, x_2, x_3
+  x_4 <- 5 - 0.1 * x_1 + 0.5 * x_2 - 0.2 * x_3 + rnorm(n, 0, 5)
   
   dat <- data.frame(x_1, x_2, x_3)
   
   # generating NAs
   mis <- sample(1:n, p_mis * n, replace = FALSE)
+  mis2 <- sample(1:n, 0.5 * n, replace = FALSE)
   dat[mis, 3] <- NA
+  dat[mis2, 4] <- NA
   
   return(dat)
 }
@@ -95,7 +99,7 @@ impTimes <- function(x, chains = c(1, seq(10,100,10))){
 }
 
 
-sizes <- c(10000, 50000, 100000)
+sizes <- c(10000, seq(25000, 100000, 25000))
 chains <- c(seq(16,96,16))
 nCores <- detectCores()
 
@@ -142,55 +146,37 @@ for (size in sizes){
   
 }
 
-
 imputationTimes <- do.call("rbind", dfList)
-imputationTimes$dataSize <- as.numeric(format(imputationTimes$dataSize,
-                                              scientific = F))
+#imputationTimes$dataSize <- as.numeric(format(imputationTimes$dataSize,
+#                                   scientific = F))
 
-plot10k <- imputationTimes %>% filter(dataSize == 10000) %>% 
-  ggplot() + 
-  geom_point(aes(x=imputations, y=sequential, color="sequential")) +
-  geom_line(aes(x=imputations, y=sequential, color="sequential")) +
-  geom_point(aes(x=imputations, y=micePar, color="mice.par")) +
-  geom_line(aes(x=imputations, y=micePar, color="mice.par")) +
-  geom_point(aes(x=imputations, y=fePar, color="foreach")) +
-  geom_line(aes(x=imputations, y=fePar, color="foreach")) +
-  geom_point(aes(x=imputations, y=parlm, color="parlmice")) +
-  geom_line(aes(x=imputations, y=parlm, color="parlmice")) +
-  xlab("Number of Imputations") + ylab("Time in seconds") +
-  ggtitle("Data size: 10.000") + 
-  scale_x_continuous(breaks=seq(16,96,16))
+plotFunction <- function(size=10000){
+  imputationTimes %>% filter(dataSize == size) %>% 
+    ggplot() + 
+    geom_point(aes(x=imputations, y=sequential, color="sequential")) +
+    geom_line(aes(x=imputations, y=sequential, color="sequential")) +
+    geom_point(aes(x=imputations, y=micePar, color="mice.par")) +
+    geom_line(aes(x=imputations, y=micePar, color="mice.par")) +
+    geom_point(aes(x=imputations, y=fePar, color="foreach")) +
+    geom_line(aes(x=imputations, y=fePar, color="foreach")) +
+    geom_point(aes(x=imputations, y=parlm, color="parlmice")) +
+    geom_line(aes(x=imputations, y=parlm, color="parlmice")) +
+    xlab("Number of Imputations") + ylab("Time in seconds") +
+    ggtitle(paste0("Data size: ", size)) + 
+    scale_x_continuous(breaks=seq(16,96,16))
+}
 
-plot50k <- imputationTimes %>% filter(dataSize == 50000) %>% 
-  ggplot() + 
-  geom_point(aes(x=imputations, y=sequential, color="sequential")) +
-  geom_line(aes(x=imputations, y=sequential, color="sequential")) +
-  geom_point(aes(x=imputations, y=micePar, color="mice.par")) +
-  geom_line(aes(x=imputations, y=micePar, color="mice.par")) +
-  geom_point(aes(x=imputations, y=fePar, color="foreach")) +
-  geom_line(aes(x=imputations, y=fePar, color="foreach")) +
-  geom_point(aes(x=imputations, y=parlm, color="parlmice")) +
-  geom_line(aes(x=imputations, y=parlm, color="parlmice")) +
-  xlab("Number of Imputations") + ylab("Time in seconds") +
-  ggtitle("Data size: 50.000") + 
-  scale_x_continuous(breaks=seq(16,96,16))
-
-plot100k <- imputationTimes %>% filter(dataSize == 100000) %>% 
-  ggplot() + 
-  geom_point(aes(x=imputations, y=sequential, color="sequential")) +
-  geom_line(aes(x=imputations, y=sequential, color="sequential")) +
-  geom_point(aes(x=imputations, y=micePar, color="mice.par")) +
-  geom_line(aes(x=imputations, y=micePar, color="mice.par")) +
-  geom_point(aes(x=imputations, y=fePar, color="foreach")) +
-  geom_line(aes(x=imputations, y=fePar, color="foreach")) +
-  geom_point(aes(x=imputations, y=parlm, color="parlmice")) +
-  geom_line(aes(x=imputations, y=parlm, color="parlmice")) +
-  xlab("Number of Imputations") + ylab("Time in seconds") +
-  ggtitle("Data size: 100.000") + 
-  scale_x_continuous(breaks=seq(16,96,16))
+plot10k <- plotFunction(10000)
+plot25k <- plotFunction(25000)
+plot50k <- plotFunction(50000)
+plot75k <- plotFunction(75000)
+plot100k <- plotFunction(100000)
 
 
-allPlots <- ggarrange(plot10k, plot50k, 
-                      plot100k, 
-                      ncol = 3,
-                      nrow = 1)
+ggarrange(plot10k,
+          plot25k,
+          plot50k,
+          plot75k,
+          plot100k,
+          ncol = 3,
+          nrow = 2)
