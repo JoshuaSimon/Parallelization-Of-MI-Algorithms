@@ -68,7 +68,7 @@ impTimes <- function(x, chains = c(1, seq(10,100,10))){
     
     # sequential run
     startTime <- Sys.time()
-    imp <- mice(data = dat, m = i, maxit = 5, 
+    imp <- mice(data = x, m = i, maxit = 5, 
                 printFlag = FALSE, seed = seed)
     endTime <- Sys.time()
     seqTimes <- c(seqTimes, 
@@ -83,7 +83,7 @@ impTimes <- function(x, chains = c(1, seq(10,100,10))){
     
     # mice.par run
     startTime <- Sys.time()
-    imp <- mice.par(don.na = dat, m = i, maxit = 5,
+    imp <- mice.par(don.na = x, m = i, maxit = 5,
                     printFlag = FALSE, seed = seed)
     endTime <- Sys.time()
     miceparTimes<- c(miceparTimes, 
