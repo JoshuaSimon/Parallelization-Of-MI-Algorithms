@@ -130,7 +130,7 @@ impTimes <- function(x, chains = c(1, seq(10,100,10))){
 
 
 sizes <- c(10000, seq(25000, 100000, 25000))
-sizes <- 100000
+#sizes <- 100000
 chains <- c(seq(16,96,16))
 nCores <- detectCores()
 
