@@ -9,6 +9,7 @@
 
 library(car)
 library(tidyverse)
+library(ggpubr)
 
 library(mice)
 library(micemd)
@@ -47,6 +48,40 @@ generate_sim_data <- function(n, seed) {
 }
 
 
+# Take the ESS04 data set and generate missing values within.
+generate_ess04_data <- function(seed) {
+  set.seed(seed) 
+
+  load("data/ESS04_data.RData")
+  dat <- ess[complete.cases(ess), ]
+  dat <- sapply(dat, as.numeric) %>% as.data.frame()
+  n <- NROW(dat)
+
+  # Create missing values.
+  mcar1 <- sample(nrow(dat), round(0.3 * n))
+  mcar2 <- sample(nrow(dat), round(0.3 * n))
+  mar <- order(dat$tvtot + rnorm(n, 0, 0.5 * sd(dat$tvtot)),
+              decreasing = TRUE)[1:(round(0.3 * n))]
+
+  is.na(dat$happy[mcar1]) <- TRUE
+  is.na(dat$netuse[mcar2]) <- TRUE
+  is.na(dat$vote[mar]) <- TRUE
+
+  return(dat)
+}
+
+
+# Wrapper function for parlmice(). This is mandatory, if you
+# want to pass differently named arguments to parlmice form
+# another scope. The reason for this is the internal handling
+# of parlmice with argument lists, which are passed to the cluster.
+parlmice_wrap <- function(data, m, cluster.seed, n.core, n.imp.core) {
+  result <- parlmice(data = data, m = m, cluster.seed = cluster.seed,
+            n.core = n.core, n.imp.core = n.imp.core, maxit = 5)
+  return(result)
+}
+
+
 # Calculate multiple imputations for different counts of imputation
 # runs M. First the imputations are calculated in a sequential manner
 # and then in parallel.
@@ -60,7 +95,7 @@ benmark_imputations <- function(data, imp_runs) {
   #data <- SLID
 
   for (i in 1:length(imp_runs)) {
-    seed = 1
+    seed = 42
     set.seed(seed)
   
     num_imp <- imp_runs[i]
@@ -68,7 +103,7 @@ benmark_imputations <- function(data, imp_runs) {
   
     # Sequential run.
     time_start_seq <- Sys.time()
-    imp_mice <- mice(data, m = num_imp, maxit = 2, printFlag = FALSE)
+    imp_mice <- mice(data, m = num_imp, maxit = 5, printFlag = FALSE)
     time_end_seq <- Sys.time()
     time_taken_seq <- difftime(time_end_seq, time_start_seq, units = "secs")
     seq_runtimes[i] <- as.numeric(time_taken_seq)
@@ -83,8 +118,8 @@ benmark_imputations <- function(data, imp_runs) {
     clusterSetRNGStream(cl, seed)
     registerDoParallel(cl)
   
-    par_mice <- foreach(i=1:num_imp, .packages="mice") %dopar% {
-      mice(data = data, m = 1, maxit = 2, printFlag = FALSE)
+    par_mice <- foreach(i=1:num_imp, .combine = ibind, .packages="mice") %dopar% {
+      mice(data = data, m = 1, maxit = 5, printFlag = FALSE)
     }
   
     stopCluster(cl)
@@ -96,17 +131,17 @@ benmark_imputations <- function(data, imp_runs) {
     
     
     # Parallel run with built-in mice function.
-    #time_start_par_mice <- Sys.time()
-    #parlmice(data = data, m = num_imp, cluster.seed = seed,
-    #         n.core = num_cores, n.imp.core = ceiling(num_imp/num_cores), maxit = 2)
-    #time_end_par_mice <- Sys.time()
-    #time_taken_par_mice <- difftime(time_end_par_mice, time_start_par_mice, units = "secs")
-    #par_mice_runtimes[i] <- as.numeric(time_taken_par_mice)
-    #print(paste0("Runtime in parallel execution (parlmice) is ", time_taken_par_mice, " seconds."))
+    time_start_par_mice <- Sys.time()
+    parlmice_wrap(data = data, m = num_imp, cluster.seed = seed,
+             n.core = num_cores, n.imp.core = ceiling(num_imp/num_cores))
+    time_end_par_mice <- Sys.time()
+    time_taken_par_mice <- difftime(time_end_par_mice, time_start_par_mice, units = "secs")
+    par_mice_runtimes[i] <- as.numeric(time_taken_par_mice)
+    print(paste0("Runtime in parallel execution (parlmice) is ", time_taken_par_mice, " seconds."))
 
     # Parallel run with parallel mice function from micemd package.
     time_start_par_mice_md <- Sys.time()
-    mice.par(don.na = data, m = num_imp, maxit = 2, seed = seed, nnodes = num_cores)
+    mice.par(don.na = data, m = num_imp, maxit = 5, seed = seed, nnodes = num_cores)
     time_end_par_mice_md <- Sys.time()
     time_taken_par_mice_md <- difftime(time_end_par_mice_md, time_start_par_mice_md, units = "secs")
     par_mice_runtimes_md[i] <- as.numeric(time_taken_par_mice_md)
@@ -182,20 +217,21 @@ plots <- benmark_run(test_mode = 1, test_data)
 plots[[1]]
 
 
+test_data <- list(generate_ess04_data(42))
+plots <- benmark_run(test_mode = 1, test_data)
+plots[[1]]
+
+
 # Test the impact of different data sizes.
 test_data <- list(generate_sim_data(n = 100, seed = 42),
                  generate_sim_data(n = 1000, seed = 42),
                  generate_sim_data(n = 10000, seed = 42),
                  generate_sim_data(n = 100000, seed = 42))
 plots <- benmark_run(test_mode = 1, test_data)
-plots[[1]]
-plots[[2]]
-plots[[3]]
-plots[[4]]
 
-
-# For some weird reason parlmice does not work with passed 
-# arguments within a function scope. Hence, one must test it 
-# outside in the global scope.
-system.time(parlmice(data = SLID, m = 16, cluster.seed = 1,
-            n.core = 16, n.imp.core = 1, maxit = 2))
+ggarrange(plots[[1]],
+          plots[[2]],
+          plots[[3]],
+          plots[[4]],
+          ncol = 2,
+          nrow = 2)
