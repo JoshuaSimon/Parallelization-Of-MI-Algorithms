@@ -1,8 +1,8 @@
 # example_joshua.R
 # ------------------------------------------------ #
-# Calculate a row of multiple impuations using the 
+# Calculate a row of multiple impuations using the
 # mice package. Is is done on three ways:
-# 1. Using mice sequentially 
+# 1. Using mice sequentially
 # 2. Using in mice in parallel with foreach
 # 3. Using the mice bulit-in function parmice
 # ------------------------------------------------ #
@@ -25,7 +25,8 @@ power_of_two <- function(n) {
 
 
 # Making use of Sven's simulated data.
-# Returns a dataframe containing n observations of 
+# Returns a dataframe containing n observations of
+# simulated data.
 generate_sim_data <- function(n, seed) {
   set.seed(seed) 
   # 3 variables
@@ -104,10 +105,10 @@ benmark_imputations <- function(data, imp_runs) {
   for (i in 1:length(imp_runs)) {
     seed = 42
     set.seed(seed)
-  
+
     num_imp <- imp_runs[i]
     print(paste0("Running M = ", num_imp, " multiple impuations..."))
-  
+
     # Sequential run.
     time_start_seq <- Sys.time()
     result_seq <- mice(data, m = num_imp, maxit = 5, printFlag = FALSE)
@@ -115,7 +116,7 @@ benmark_imputations <- function(data, imp_runs) {
     time_taken_seq <- difftime(time_end_seq, time_start_seq, units = "secs")
     seq_runtimes[i] <- as.numeric(time_taken_seq)
     print(paste0("Runtime in sequential execution (mice) is ", time_taken_seq, " seconds."))
-    
+
     assert_output(result_seq, num_imp)
   
     # Parallel run with foreach.
@@ -187,9 +188,9 @@ benmark_plot <- function(runtime_data, imp_runs) {
                         values = c("sequential runtimes"="red", "foreach runtimes"="blue", 
                                   "parlmice runtimes"="orange", "mice.par runtimes"="darkgreen"))
 
-  plot <- plot + 
+  plot <- plot +
     ggtitle("Runtime of Multiple Imputations") +
-    scale_x_continuous(breaks=imp_runs) +
+    scale_x_continuous(breaks = imp_runs) +
     xlab("Number of multiple imputations M") + ylab("Runtime in seconds")
   
   return(plot)
@@ -197,14 +198,14 @@ benmark_plot <- function(runtime_data, imp_runs) {
 
 
 benmark_run <- function(test_data, test_mode = 1) {
-  # Choose the number of imputations which are 
-  # calculated in the benchmark. 
+  # Choose the number of imputations which are
+  # calculated in the benchmark.
   if (test_mode == 1) {
     max_imp <- 100
     steps <- 16
     imp_runs <- seq(16, max_imp, by = steps)
 
-    # Offset the first iteration. 
+    # Offset the first iteration.
     #imp_runs[1] <- 1    
   } else if (test_mode == 2) {
      imp_runs <- power_of_two(7)
@@ -225,7 +226,7 @@ benmark_run <- function(test_data, test_mode = 1) {
 }
 
 
-# Load up some test data. 
+# Load up some test data.
 data(SLID)
 names(SLID) <- c("einkommen", "bildung", "alter", "geschlecht", "sprache")
 
