@@ -18,7 +18,7 @@ library(mice)
 library(micemd)
 library(parallel)
 library(doParallel)
-library(doMC)
+#library(doMC)
 
 # Load up the data generator function.
 source("src/dataGenerator.R")
@@ -185,7 +185,7 @@ benmark_plot <- function(runtime_data, cores, value = "time") {
             geom_line(aes(cores, serial_time, color = "serial"))
 
         plot <- plot +
-            ggtitle("Run time of Multiple Imputations") +
+            ggtitle("Runtime of Multiple Imputations") +
             scale_x_continuous(breaks = cores) +
             xlab("Number of CPU cores") + ylab("Runtime in seconds")
         return(plot)
@@ -217,7 +217,7 @@ cores <- c(1, power_of_two(log(num_cores) / log(2)))
 data <- dataGenerator(n = 10000)
 runtime_data <- benmark_imputation(
     data = data, num_imp = 128,
-    cores = cores, runs = 1)
+    cores = cores, runs = 5)
 
 # Plot the results.
 ggarrange(
