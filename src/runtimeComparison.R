@@ -73,7 +73,7 @@ furrrImp <- function(x){
                                        seed = seed,
                                        printFlag = FALSE))
   imp <- imps[[1]]
-  for(i in 2:length(impFurrr)){
+  for(i in 2:length(imps)){
     imp <- ibind(imp, imps[[i]])
   }
   return(imp)
