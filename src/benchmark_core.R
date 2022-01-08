@@ -196,22 +196,28 @@ benmark_imputation <- function(data, num_imp, cores, runs = 5, os_test = FALSE) 
     # as well as the estimated parallelism.
     runtime_data <- data.frame(
         cores, serial_time,
-        foreach_time, foreach_time_fork,
-        parlmice_time, parlmice_time_fork,
+        foreach_time, 
+        foreach_time_fork,
+        parlmice_time, 
+        parlmice_time_fork,
         micemd_time,
         serial_time / foreach_time,
-        serial_time / parlmice_time,
         serial_time / foreach_time_fork,
+        serial_time / parlmice_time,
         serial_time / parlmice_time_fork,
         serial_time / micemd_time)
 
     colnames(runtime_data) <- c(
         "cores", "serial_time",
-        "foreach_time", "foreach_time_fork",
-        "parlmice_time", "parlmice_time_fork",
+        "foreach_time", 
+        "foreach_time_fork",
+        "parlmice_time", 
+        "parlmice_time_fork",
         "micemd_time",
-        "foreach_speed_up", "foreach_fork_speed_up",
-        "parlmice_speed_up", "parlmice_fork_speed_up",
+        "foreach_speed_up", 
+        "foreach_fork_speed_up",
+        "parlmice_speed_up", 
+        "parlmice_fork_speed_up",
         "micemd_speed_up"
     )
 
