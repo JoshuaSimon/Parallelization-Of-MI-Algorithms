@@ -1,0 +1,29 @@
+Definitionen system.time
+
+"User CPU time" gives the CPU time spent by the current process (i.e., the current R session) 
+and "system CPU time" gives the CPU time spent by the kernel (the operating system) on behalf 
+of the current process. The operating system is used for things like opening files, doing input 
+or output, starting other processes, and looking at the system clock: operations that involve 
+resources that many processes must share.
+
+The ‘user time’ is the CPU time charged for the execution of user instructions of the calling  
+process. The ‘system time’ is the CPU time charged for execution by the system on behalf of the 
+calling process.
+
+Elapsed Time is the time charged to the CPU(s) for the expression.
+User Time is the wall clock time. The time that you as a user experienced.
+Usually both times are relatively close. But they may vary in some other situations. For example:
+If elapsed time > user time, this means that the CPU is waiting around for some other operations 
+(may be external) to be done. If elapsed time < user time, this means that your machine has 
+multiple cores and is able to use them
+
+The term 'user CPU time' can be a bit misleading at first. To be clear, the total time 
+(real CPU time) is the combination of the amount of time the CPU spends performing some action for 
+a program and the amount of time the CPU spends performing system calls for the kernel on the 
+program's behalf. When a program loops through an array, it is accumulating user CPU time. 
+Conversely, when a program executes a system call such as exec or fork, it is accumulating system 
+CPU time.
+
+“User CPU time” gibt die CPU Zeit, die der aktuelle Prozess benötigt hat, während “system CPU time” 
+die Zeit ist, die die CPU für Betriebssystem-Prozesse (Öffnen von Dateien, andere Prozesse starten 
+etc.) benötigt.
