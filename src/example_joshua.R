@@ -15,6 +15,7 @@ library(mice)
 library(micemd)
 library(parallel)
 library(doParallel)
+library(ggpubr)
 
 
 # Returns the first n powers of 2.
@@ -235,3 +236,12 @@ ggarrange(plots[[1]],
           plots[[4]],
           ncol = 2,
           nrow = 2)
+
+imp_runs <- c(1, 7, 14, 28, 49, 70, 98)
+
+l <- colnames(dat) %>% as.character()
+names(dat) <- l
+test <- list(dat)
+
+plots <- benmark_run(test_data= test, test_mode = 1)
+

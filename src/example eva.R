@@ -44,45 +44,63 @@ registerDoParallel(cl)
 
 #Store imputation results and runtime
 result <- resultp <- resultparl <- resultpar <-   list()
-systp <- syst <- systparl <- systpar <- vector(length=length(R))
-
+systp <- syst <- systparl <- systpar <- matrix(nrow = length(R), ncol=3)
+R<- 1
 #Sequential and different parallelized MIs
 for(i in 1:length(R)){
-systp[i] <- system.time(resultp[[i]] <- foreach(no=1:R[i], .combine=ibind, .export = c("dat", "i"), .packages="mice") %dopar% {
+systp[i,] <- system.time(resultp[[i]] <- foreach(no=1:R[i], .combine=ibind, .export = c("dat", "i"), .packages="mice") %dopar% {
  mice(data=dat,m = 1, predictorMatrix = pred, print = F)
- })[3] #run time of parallelized MI
+ }) [1:3] #run time of parallelized MI
 
-syst[i] <- system.time(result[[i]] <- mice(data=dat,m = R[i], predictorMatrix = pred, print = F))[3]
+syst[i,] <- system.time(result[[i]] <- mice(data=dat,m = R[i], predictorMatrix = pred, print = F))[1:3]
 #run time of sequential MI
 
-systparl[i] <- system.time(resultparl[[i]] <- parlmice(data=dat, m=R[i], predictorMatrix = pred, print = F, cluster.seed = 123, n.core=7, n.imp.core = ceiling(R[i]/7)))[[3]]
+systparl[i,] <- system.time(resultparl[[i]] <- parlmice(data=dat, m=R[i], predictorMatrix = pred, print = F, cluster.seed = 123, n.core=7, n.imp.core = ceiling(R[i]/7)))[1:3]
 #run time parlmice
 
-systpar[i] <- system.time(resultpar[[i]] <- micemd::mice.par(don.na=dat, m=R[i], predictorMatrix = pred, print = F))[3]
+systpar[i,] <- system.time(resultpar[[i]] <- micemd::mice.par(don.na=dat, m=R[i], predictorMatrix = pred, print = F))[1:3]
 #runtime micemd::mice.par()
 }
 
 #Runtime Visualization
-X <- data.frame(R, systp, syst, systparl, systpar)
-plot <- ggplot(data = X, aes(R, syst)) +
+Xuser<- data.frame(R, systp[,1], syst[,1], systparl[,1], systpar[,1])
+Xsystem <- data.frame(R, systp[,2], syst[,2], systparl[,2], systpar[,2])
+Xelapsed <- data.frame(R, systp[,3], syst[,3], systparl[,3], systpar[,3])
+plote <- ggplot(data = Xelapsed, aes(Xelapsed[,1], Xelapsed[,2])) +
   geom_point(color = "red") +
-  geom_point(aes(R, systp), color = "blue") +
-  geom_point(aes(R, systparl), color = "green") +
-  geom_point(aes(R, systpar), color = "orange") +
-  geom_line(aes(R, syst, color = "sequential runtimes")) +
-  geom_line(aes(R, systp, color = "parallel runtimes")) +
-  geom_line(aes(R, systparl, color = "parlmice runtimes")) +
-  geom_line(aes(R, systpar, color = "parmice runtimes")) +
+  geom_point(aes(Xelapsed[,1], Xelapsed[,3]), color = "blue") +
+  geom_point(aes(Xelapsed[,1], Xelapsed[,4]), color = "green") +
+  geom_point(aes(Xelapsed[,1], Xelapsed[,5]), color = "orange") +
+  geom_line(aes(Xelapsed[,1], Xelapsed[,2], color = "foreach runtimes")) +
+  geom_line(aes(Xelapsed[,1], Xelapsed[,3], color = "sequential runtimes")) +
+  geom_line(aes(Xelapsed[,1], Xelapsed[,4], color = "parlmice runtimes")) +
+  geom_line(aes(Xelapsed[,1], Xelapsed[,5], color = "mice.par runtimes")) +
+  geom_point(aes(Xsystem[,1], Xsystem[,2]), color = "red") +
+  geom_point(aes(Xsystem[,1], Xsystem[,3]), color = "blue") +
+  geom_point(aes(Xsystem[,1], Xsystem[,4]), color = "green") +
+  geom_point(aes(Xsystem[,1], Xsystem[,5]), color = "orange") +
+  geom_line(aes(Xsystem[,1], Xsystem[,2], color = "foreach runtimes"), linetype=dashed) +
+  geom_line(aes(Xsystem[,1], Xsystem[,3], color = "sequential runtimes"), linetype=dashed) +
+  geom_line(aes(Xsystem[,1], Xsystem[,4], color = "parlmice runtimes"), linetype=dashed) +
+  geom_line(aes(Xsystem[,1], Xsystem[,5], color = "mice.par runtimes"), linetype=dashed) +
+  geom_point(aes(Xuser[,1], Xuser[,2]),color = "red") +
+  geom_point(aes(Xuser[,1], Xuser[,3]), color = "blue") +
+  geom_point(aes(Xuser[,1], Xuser[,4]), color = "green") +
+  geom_point(aes(Xuser[,1], Xuser[,5]), color = "orange") +
+  geom_line(aes(Xuser[,1], Xuser[,2], color = "foreach runtimes"), linetype=dotted) +
+  geom_line(aes(Xuser[,1], Xuser[,3], color = "sequential runtimes"), linetype=dotted) +
+  geom_line(aes(Xuser[,1], Xuser[,4], color = "parlmice runtimes"), linetype=dotted) +
+  geom_line(aes(Xuser[,1], Xuser[,5], color = "mice.par runtimes"), linetype=dotted) +
   scale_colour_manual("", 
-                      breaks = c("sequential runtimes", "parallel runtimes", "parlmice runtimes", "parmice runtimes"),
-                      values = c("sequential runtimes"="red", "parallel runtimes"="blue", 
+                      breaks = c("parallel runtimes", "sequential runtimes", "parlmice runtimes", "parmice runtimes"),
+                      values = c("parallel runtimes"="red", "sequential runtimes"="blue", 
                                  "parlmice runtimes"="green", "parmice runtimes"="orange"))
 
-plot <- plot + 
+plote <- plote + 
   ggtitle("Runtime of Multiple Imputations") +
   xlab("Number of multiple imputations M") + ylab("Runtime in seconds")
 
-plot
+plote
 
 #Stop Clustering
 stopCluster(cl)
