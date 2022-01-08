@@ -8,7 +8,7 @@ p_load("mice", "car", "tidyverse", "foreach", "parallel", "doParallel",
 #Data: ESS data 2004 on satisfaction in life 
 source("C:\\Users\\evawo\\Documents\\OFU Survey Statistik\\WS 21 22\\Unvollständige Daten\\Projekt\\Parallelization-Of-MI-Algorithms\\src\\dataGenerator.R")
 
-dat <- dataGenerator()
+dat <- dataGenerator(n=50000)
 
 R <- c(1, 5, 10, 20, 30, 40, 60, 80, 100) #Multiple Imputations 
 n <- NROW(dat)
@@ -46,17 +46,17 @@ systp <- syst <- systparl <- systpar <- matrix(nrow = length(R), ncol=3)
 for(i in 1:length(R)){
   
 systp[i,] <- system.time(
-resultp[[i]] <- foreachfunction(data=dat, seed=seed, num_imp = i, maxit=5, m=1, predictorMatrix = predictorMatrix)
+resultp[[i]] <- foreachfunction(data=dat, seed=seed, num_imp = R[i], maxit=5, m=1, predictorMatrix = predictorMatrix)
 )[1:3]
 #run time of parallelized MI
 
-syst[i,] <- system.time(result[[i]] <- mice(data=dat,m = R[i], predictorMatrix = pred, print = F))[1:3]
+syst[i,] <- system.time(result[[i]] <- mice(data=dat,m = R[i], predictorMatrix = predictorMatrix, print = F, seed=seed))[1:3]
 #run time of sequential MI
 
-systparl[i,] <- system.time(resultparl[[i]] <- parlmice(data=dat, m=R[i], predictorMatrix = pred, print = F, cluster.seed = 123, n.core=7, n.imp.core = ceiling(R[i]/7)))[1:3]
+systparl[i,] <- system.time(resultparl[[i]] <- parlmice(data=dat, m=R[i], predictorMatrix = predictorMatrix, print = F, cluster.seed = seed, n.core=7, n.imp.core = ceiling(R[i]/7)))[1:3]
 #run time parlmice
 
-systpar[i,] <- system.time(resultpar[[i]] <- micemd::mice.par(don.na=dat, m=R[i], predictorMatrix = pred, print = F))[1:3]
+systpar[i,] <- system.time(resultpar[[i]] <- micemd::mice.par(don.na=dat, m=R[i], predictorMatrix = predictorMatrix, print = F, seed=seed))[1:3]
 #runtime micemd::mice.par()
 }
 
@@ -64,43 +64,6 @@ systpar[i,] <- system.time(resultpar[[i]] <- micemd::mice.par(don.na=dat, m=R[i]
 Xuser<- data.frame(R, systp[,1], syst[,1], systparl[,1], systpar[,1])
 Xsystem <- data.frame(R, systp[,2], syst[,2], systparl[,2], systpar[,2])
 Xelapsed <- data.frame(R, systp[,3], syst[,3], systparl[,3], systpar[,3])
-#Plot all together
-plot <- ggplot(data = Xelapsed, aes(Xelapsed[,1], Xelapsed[,2])) +
-  geom_point(color = "red") +
-  geom_point(aes(Xelapsed[,1], Xelapsed[,3]), color = "blue") +
-  geom_point(aes(Xelapsed[,1], Xelapsed[,4]), color = "green") +
-  geom_point(aes(Xelapsed[,1], Xelapsed[,5]), color = "orange") +
-  geom_line(aes(Xelapsed[,1], Xelapsed[,2], color = "foreach runtimes")) +
-  geom_line(aes(Xelapsed[,1], Xelapsed[,3], color = "sequential runtimes")) +
-  geom_line(aes(Xelapsed[,1], Xelapsed[,4], color = "parlmice runtimes")) +
-  geom_line(aes(Xelapsed[,1], Xelapsed[,5], color = "mice.par runtimes")) +
-  geom_point(aes(Xsystem[,1], Xsystem[,2]), color = "red") +
-  geom_point(aes(Xsystem[,1], Xsystem[,3]), color = "blue") +
-  geom_point(aes(Xsystem[,1], Xsystem[,4]), color = "green") +
-  geom_point(aes(Xsystem[,1], Xsystem[,5]), color = "orange") +
-  geom_line(aes(Xsystem[,1], Xsystem[,2], color = "foreach runtimes"), linetype="dashed") +
-  geom_line(aes(Xsystem[,1], Xsystem[,3], color = "sequential runtimes"), linetype="dashed") +
-  geom_line(aes(Xsystem[,1], Xsystem[,4], color = "parlmice runtimes"), linetype="dashed") +
-  geom_line(aes(Xsystem[,1], Xsystem[,5], color = "mice.par runtimes"), linetype="dashed") +
-  geom_point(aes(Xuser[,1], Xuser[,2]),color = "red") +
-  geom_point(aes(Xuser[,1], Xuser[,3]), color = "blue") +
-  geom_point(aes(Xuser[,1], Xuser[,4]), color = "green") +
-  geom_point(aes(Xuser[,1], Xuser[,5]), color = "orange") +
-  geom_line(aes(Xuser[,1], Xuser[,2], color = "foreach runtimes"), linetype="dotted") +
-  geom_line(aes(Xuser[,1], Xuser[,3], color = "sequential runtimes"), linetype="dotted") +
-  geom_line(aes(Xuser[,1], Xuser[,4], color = "parlmice runtimes"), linetype="dotted") +
-  geom_line(aes(Xuser[,1], Xuser[,5], color = "mice.par runtimes"), linetype="dotted") +
-  scale_colour_manual("", 
-                      breaks = c("foreach runtimes", "sequential runtimes", "parlmice runtimes", "mice.par runtimes"),
-                      values = c("foreach runtimes"="red", "sequential runtimes"="blue", 
-                                 "parlmice runtimes"="green", "mice.par runtimes"="orange"))+
-  scale_linetype_manual(values=c("elapsed"="solid","system time"="dashed", "user time"="dotted"))
-
-plot <- plot + 
-  ggtitle("Runtime of Multiple Imputations") +
-  xlab("Number of multiple imputations M") + ylab("Runtime in seconds")
-
-plot
 
 #plot elapsed time
 plote <- ggplot(data = Xelapsed, aes(Xelapsed[,1], Xelapsed[,2])) +
@@ -119,7 +82,7 @@ plote <- ggplot(data = Xelapsed, aes(Xelapsed[,1], Xelapsed[,2])) +
   scale_linetype_manual(values=c("elapsed"="solid","system time"="dashed", "user time"="dotted"))
 
 plote <- plote + 
-  ggtitle("Runtime of Multiple Imputations") +
+  ggtitle("Elapsed Runtime of Multiple Imputations") +
   xlab("Number of multiple imputations M") + ylab("Runtime in seconds")
 
 plote  
@@ -141,7 +104,7 @@ plotu <- ggplot(data = Xuser, aes(Xuser[,1], Xuser[,2])) +
   scale_linetype_manual(values=c("elapsed"="solid","system time"="dashed", "user time"="dotted"))
 
 plotu <- plotu + 
-  ggtitle("Runtime of Multiple Imputations") +
+  ggtitle("User CPU Runtime of Multiple Imputations") +
   xlab("Number of multiple imputations M") + ylab("Runtime in seconds")
 
 plotu  
@@ -163,7 +126,7 @@ plots <- ggplot(data = Xsystem, aes(Xsystem[,1], Xsystem[,2])) +
   scale_linetype_manual(values=c("elapsed"="solid","system time"="dashed", "user time"="dotted"))
 
 plots <- plots + 
-  ggtitle("Runtime of Multiple Imputations") +
+  ggtitle("System CPU Runtime of Multiple Imputations") +
   xlab("Number of multiple imputations M") + ylab("Runtime in seconds")
 
 plots
