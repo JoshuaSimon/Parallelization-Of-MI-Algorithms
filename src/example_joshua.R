@@ -1,8 +1,8 @@
 # example_joshua.R
 # ------------------------------------------------ #
-# Calculate a row of multiple impuations using the 
+# Calculate a row of multiple impuations using the
 # mice package. Is is done on three ways:
-# 1. Using mice sequentially 
+# 1. Using mice sequentially
 # 2. Using in mice in parallel with foreach
 # 3. Using the mice bulit-in function parmice
 # ------------------------------------------------ #
@@ -10,6 +10,7 @@
 library(car)
 library(tidyverse)
 library(ggpubr)
+library(testit)
 
 library(mice)
 library(micemd)
@@ -25,7 +26,8 @@ power_of_two <- function(n) {
 
 
 # Making use of Sven's simulated data.
-# Retunrs a dataframe containing n observations of 
+# Returns a dataframe containing n observations of
+# simulated data.
 generate_sim_data <- function(n, seed) {
   set.seed(seed) 
   # 3 variables
@@ -83,33 +85,40 @@ parlmice_wrap <- function(data, m, cluster.seed, n.core, n.imp.core) {
 }
 
 
+# Do some unit test on a resulting mids object which is
+# the output of mice and parallel mice calls.
+assert_output <- function(mids_object, num_imp) {
+  assert("Number of imputations did not match", mids_object$m == num_imp)
+}
+
+
 # Calculate multiple imputations for different counts of imputation
 # runs M. First the imputations are calculated in a sequential manner
 # and then in parallel.
-# Retruns a dataframe containing all the runtimes of the different
-# MI algorithms.
+# Returns a dataframe containing all the run times of the different
+# parallel MI algorithms.
 benmark_imputations <- function(data, imp_runs) {
   seq_runtimes <- numeric(length(imp_runs))
   par_runtimes <- numeric(length(imp_runs))
   par_mice_runtimes <- numeric(length(imp_runs))
   par_mice_runtimes_md <- numeric(length(imp_runs))
-  #data <- SLID
 
   for (i in 1:length(imp_runs)) {
     seed = 42
     set.seed(seed)
-  
+
     num_imp <- imp_runs[i]
     print(paste0("Running M = ", num_imp, " multiple impuations..."))
-  
+
     # Sequential run.
     time_start_seq <- Sys.time()
-    imp_mice <- mice(data, m = num_imp, maxit = 5, printFlag = FALSE)
+    result_seq <- mice(data, m = num_imp, maxit = 5, printFlag = FALSE)
     time_end_seq <- Sys.time()
     time_taken_seq <- difftime(time_end_seq, time_start_seq, units = "secs")
     seq_runtimes[i] <- as.numeric(time_taken_seq)
     print(paste0("Runtime in sequential execution (mice) is ", time_taken_seq, " seconds."))
-  
+
+    assert_output(result_seq, num_imp)
   
     # Parallel run with foreach.
     time_start_par <- Sys.time()
@@ -119,7 +128,7 @@ benmark_imputations <- function(data, imp_runs) {
     clusterSetRNGStream(cl, seed)
     registerDoParallel(cl)
   
-    par_mice <- foreach(i=1:num_imp, .combine = ibind, .packages="mice") %dopar% {
+    result_foreach <- foreach(i=1:num_imp, .combine = ibind, .packages="mice") %dopar% {
       mice(data = data, m = 1, maxit = 5, printFlag = FALSE)
     }
   
@@ -130,23 +139,30 @@ benmark_imputations <- function(data, imp_runs) {
     par_runtimes[i] <- as.numeric(time_taken_par)
     print(paste0("Runtime in parallel execution (foreach) is ", time_taken_par, " seconds."))
     
+    assert_output(result_foreach, num_imp)
     
     # Parallel run with built-in mice function.
     time_start_par_mice <- Sys.time()
-    parlmice_wrap(data = data, m = num_imp, cluster.seed = seed,
-             n.core = num_cores, n.imp.core = ceiling(num_imp/num_cores))
+    result_parlmice <- parlmice_wrap(data = data, m = num_imp, 
+                                    cluster.seed = seed,
+                                    n.core = num_cores, 
+                                    n.imp.core = ceiling(num_imp/num_cores))
     time_end_par_mice <- Sys.time()
     time_taken_par_mice <- difftime(time_end_par_mice, time_start_par_mice, units = "secs")
     par_mice_runtimes[i] <- as.numeric(time_taken_par_mice)
     print(paste0("Runtime in parallel execution (parlmice) is ", time_taken_par_mice, " seconds."))
+    
+    assert_output(result_parlmice, num_imp)
 
     # Parallel run with parallel mice function from micemd package.
     time_start_par_mice_md <- Sys.time()
-    mice.par(don.na = data, m = num_imp, maxit = 5, seed = seed, nnodes = num_cores)
+    result_micepar <- mice.par(don.na = data, m = num_imp, maxit = 5, seed = seed, nnodes = num_cores)
     time_end_par_mice_md <- Sys.time()
     time_taken_par_mice_md <- difftime(time_end_par_mice_md, time_start_par_mice_md, units = "secs")
     par_mice_runtimes_md[i] <- as.numeric(time_taken_par_mice_md)
     print(paste0("Runtime in parallel execution (mice.par) is ", time_taken_par_mice_md, " seconds."))
+    
+    assert_output(result_micepar, num_imp)
   }
 
   runtime_data <- data.frame(imp_runs, seq_runtimes, par_runtimes, par_mice_runtimes, par_mice_runtimes_md)
@@ -154,7 +170,7 @@ benmark_imputations <- function(data, imp_runs) {
 }
 
 
-# Create a plot displaying als the runtimes as cruves
+# Create a plot displaying all the run times as curves
 # for the different MI implementations. 
 # Returns a ggplot object.
 benmark_plot <- function(runtime_data, imp_runs) {
@@ -168,13 +184,14 @@ benmark_plot <- function(runtime_data, imp_runs) {
     geom_line(aes(imp_runs, par_mice_runtimes, color = "parlmice runtimes")) +
     geom_line(aes(imp_runs, par_mice_runtimes_md, color = "mice.par runtimes")) +
     scale_colour_manual("", 
-                        breaks = c("sequential runtimes", "foreach runtimes", "parlmice runtimes", "mice.par runtimes"),
+                        breaks = c("sequential runtimes", "foreach runtimes",
+                                   "parlmice runtimes", "mice.par runtimes"),
                         values = c("sequential runtimes"="red", "foreach runtimes"="blue", 
                                   "parlmice runtimes"="orange", "mice.par runtimes"="darkgreen"))
 
-  plot <- plot + 
+  plot <- plot +
     ggtitle("Runtime of Multiple Imputations") +
-    scale_x_continuous(breaks=imp_runs) +
+    scale_x_continuous(breaks = imp_runs) +
     xlab("Number of multiple imputations M") + ylab("Runtime in seconds")
   
   return(plot)
@@ -182,15 +199,15 @@ benmark_plot <- function(runtime_data, imp_runs) {
 
 
 benmark_run <- function(test_data, test_mode = 1) {
-  # Choose the number of impuations which are 
-  # calculated in the benchmark. 
+  # Choose the number of imputations which are
+  # calculated in the benchmark.
   if (test_mode == 1) {
     max_imp <- 100
     steps <- 16
-    imp_runs <- seq(0, max_imp, by = steps)
+    imp_runs <- seq(16, max_imp, by = steps)
 
-    # Offset the first iteration. 
-    imp_runs[1] <- 1    
+    # Offset the first iteration.
+    #imp_runs[1] <- 1    
   } else if (test_mode == 2) {
      imp_runs <- power_of_two(7)
      imp_runs <- c(1, imp_runs)
@@ -202,14 +219,15 @@ benmark_run <- function(test_data, test_mode = 1) {
   # are saved. 
   plots <- vector(mode = "list", length = length(test_data))
   for (i in 1:length(test_data)) {
-     plots[[i]] <- benmark_imputations(data = test_data[[i]], imp_runs = imp_runs) %>% benmark_plot(runtime_data = ., imp_runs = imp_runs)
+     plots[[i]] <- benmark_imputations(data = test_data[[i]], imp_runs = imp_runs) %>%
+      benmark_plot(runtime_data = ., imp_runs = imp_runs)
   }
   
   return(plots)
 }
 
 
-# Load up some test data. 
+# Load up some test data.
 data(SLID)
 names(SLID) <- c("einkommen", "bildung", "alter", "geschlecht", "sprache")
 

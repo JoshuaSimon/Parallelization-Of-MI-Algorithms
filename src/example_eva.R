@@ -5,11 +5,7 @@ p_load("mice", "car", "tidyverse", "foreach", "parallel", "doParallel",
        "iterators", "testit", "devtools", "usethis", "micemd")
 
 #Data: ESS data 2004 on satisfaction in life 
-load("C:\\Users\\evawo\\Documents\\OFU Survey Statistik\\WS 21 22\\Unvollständige Daten\\ESS04_data.RData")
-
-
-dat <- ess[complete.cases(ess), ]
-dat <- sapply(dat, as.numeric) %>% as.data.frame()
+source("src/dataGenerator.R")
 
 R <- c(1, 5, 10, 20, 30, 40, 60, 80, 100) #Multiple Imputations 
 n <- NROW(dat)
@@ -79,22 +75,23 @@ plote <- ggplot(data = Xelapsed, aes(Xelapsed[,1], Xelapsed[,2])) +
   geom_point(aes(Xsystem[,1], Xsystem[,3]), color = "blue") +
   geom_point(aes(Xsystem[,1], Xsystem[,4]), color = "green") +
   geom_point(aes(Xsystem[,1], Xsystem[,5]), color = "orange") +
-  geom_line(aes(Xsystem[,1], Xsystem[,2], color = "foreach runtimes"), linetype=dashed) +
-  geom_line(aes(Xsystem[,1], Xsystem[,3], color = "sequential runtimes"), linetype=dashed) +
-  geom_line(aes(Xsystem[,1], Xsystem[,4], color = "parlmice runtimes"), linetype=dashed) +
-  geom_line(aes(Xsystem[,1], Xsystem[,5], color = "mice.par runtimes"), linetype=dashed) +
+  geom_line(aes(Xsystem[,1], Xsystem[,2], color = "foreach runtimes"), linetype="dashed") +
+  geom_line(aes(Xsystem[,1], Xsystem[,3], color = "sequential runtimes"), linetype="dashed") +
+  geom_line(aes(Xsystem[,1], Xsystem[,4], color = "parlmice runtimes"), linetype="dashed") +
+  geom_line(aes(Xsystem[,1], Xsystem[,5], color = "mice.par runtimes"), linetype="dashed") +
   geom_point(aes(Xuser[,1], Xuser[,2]),color = "red") +
   geom_point(aes(Xuser[,1], Xuser[,3]), color = "blue") +
   geom_point(aes(Xuser[,1], Xuser[,4]), color = "green") +
   geom_point(aes(Xuser[,1], Xuser[,5]), color = "orange") +
-  geom_line(aes(Xuser[,1], Xuser[,2], color = "foreach runtimes"), linetype=dotted) +
-  geom_line(aes(Xuser[,1], Xuser[,3], color = "sequential runtimes"), linetype=dotted) +
-  geom_line(aes(Xuser[,1], Xuser[,4], color = "parlmice runtimes"), linetype=dotted) +
-  geom_line(aes(Xuser[,1], Xuser[,5], color = "mice.par runtimes"), linetype=dotted) +
+  geom_line(aes(Xuser[,1], Xuser[,2], color = "foreach runtimes"), linetype="dotted") +
+  geom_line(aes(Xuser[,1], Xuser[,3], color = "sequential runtimes"), linetype="dotted") +
+  geom_line(aes(Xuser[,1], Xuser[,4], color = "parlmice runtimes"), linetype="dotted") +
+  geom_line(aes(Xuser[,1], Xuser[,5], color = "mice.par runtimes"), linetype="dotted") +
   scale_colour_manual("", 
                       breaks = c("parallel runtimes", "sequential runtimes", "parlmice runtimes", "parmice runtimes"),
                       values = c("parallel runtimes"="red", "sequential runtimes"="blue", 
-                                 "parlmice runtimes"="green", "parmice runtimes"="orange"))
+                                 "parlmice runtimes"="green", "parmice runtimes"="orange"))+
+  scale_linetype_manual(values=c("elapsed"="solid","system time"="dashed", "user time"="dotted"))
 
 plote <- plote + 
   ggtitle("Runtime of Multiple Imputations") +
@@ -102,5 +99,5 @@ plote <- plote +
 
 plote
 
-#Stop Clustering
+cd"#Stop Clustering
 stopCluster(cl)
