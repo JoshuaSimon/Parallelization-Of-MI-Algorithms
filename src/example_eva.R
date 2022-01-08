@@ -2,7 +2,7 @@
 #Packages
 library("pacman") # packagemanager
 p_load("mice", "car", "tidyverse", "foreach", "parallel", "doParallel",
-       "iterators", "testit", "devtools", "usethis", "micemd")
+       "iterators", "testit", "devtools", "usethis", "micemd", "ggpubr")
 
 
 #Data: ESS data 2004 on satisfaction in life 
@@ -64,7 +64,8 @@ systpar[i,] <- system.time(resultpar[[i]] <- micemd::mice.par(don.na=dat, m=R[i]
 Xuser<- data.frame(R, systp[,1], syst[,1], systparl[,1], systpar[,1])
 Xsystem <- data.frame(R, systp[,2], syst[,2], systparl[,2], systpar[,2])
 Xelapsed <- data.frame(R, systp[,3], syst[,3], systparl[,3], systpar[,3])
-plote <- ggplot(data = Xelapsed, aes(Xelapsed[,1], Xelapsed[,2])) +
+#Plot all together
+plot <- ggplot(data = Xelapsed, aes(Xelapsed[,1], Xelapsed[,2])) +
   geom_point(color = "red") +
   geom_point(aes(Xelapsed[,1], Xelapsed[,3]), color = "blue") +
   geom_point(aes(Xelapsed[,1], Xelapsed[,4]), color = "green") +
@@ -90,16 +91,82 @@ plote <- ggplot(data = Xelapsed, aes(Xelapsed[,1], Xelapsed[,2])) +
   geom_line(aes(Xuser[,1], Xuser[,4], color = "parlmice runtimes"), linetype="dotted") +
   geom_line(aes(Xuser[,1], Xuser[,5], color = "mice.par runtimes"), linetype="dotted") +
   scale_colour_manual("", 
-                      breaks = c("parallel runtimes", "sequential runtimes", "parlmice runtimes", "parmice runtimes"),
-                      values = c("parallel runtimes"="red", "sequential runtimes"="blue", 
-                                 "parlmice runtimes"="green", "parmice runtimes"="orange"))+
+                      breaks = c("foreach runtimes", "sequential runtimes", "parlmice runtimes", "mice.par runtimes"),
+                      values = c("foreach runtimes"="red", "sequential runtimes"="blue", 
+                                 "parlmice runtimes"="green", "mice.par runtimes"="orange"))+
+  scale_linetype_manual(values=c("elapsed"="solid","system time"="dashed", "user time"="dotted"))
+
+plot <- plot + 
+  ggtitle("Runtime of Multiple Imputations") +
+  xlab("Number of multiple imputations M") + ylab("Runtime in seconds")
+
+plot
+
+#plot elapsed time
+plote <- ggplot(data = Xelapsed, aes(Xelapsed[,1], Xelapsed[,2])) +
+  geom_point(color = "red") +
+  geom_point(aes(Xelapsed[,1], Xelapsed[,3]), color = "blue") +
+  geom_point(aes(Xelapsed[,1], Xelapsed[,4]), color = "green") +
+  geom_point(aes(Xelapsed[,1], Xelapsed[,5]), color = "orange") +
+  geom_line(aes(Xelapsed[,1], Xelapsed[,2], color = "foreach runtimes")) +
+  geom_line(aes(Xelapsed[,1], Xelapsed[,3], color = "sequential runtimes")) +
+  geom_line(aes(Xelapsed[,1], Xelapsed[,4], color = "parlmice runtimes")) +
+  geom_line(aes(Xelapsed[,1], Xelapsed[,5], color = "mice.par runtimes")) +
+  scale_colour_manual("", 
+                      breaks = c("foreach runtimes", "sequential runtimes", "parlmice runtimes", "mice.par runtimes"),
+                      values = c("foreach runtimes"="red", "sequential runtimes"="blue", 
+                                 "parlmice runtimes"="green", "mice.par runtimes"="orange"))+
   scale_linetype_manual(values=c("elapsed"="solid","system time"="dashed", "user time"="dotted"))
 
 plote <- plote + 
   ggtitle("Runtime of Multiple Imputations") +
   xlab("Number of multiple imputations M") + ylab("Runtime in seconds")
 
-plote
+plote  
 
-cd"#Stop Clustering
-stopCluster(cl)
+#plot user cpu time
+plotu <- ggplot(data = Xuser, aes(Xuser[,1], Xuser[,2])) +
+  geom_point(color = "red") +
+  geom_point(aes(Xuser[,1], Xuser[,3]), color = "blue") +
+  geom_point(aes(Xuser[,1], Xuser[,4]), color = "green") +
+  geom_point(aes(Xuser[,1], Xuser[,5]), color = "orange") +
+  geom_line(aes(Xuser[,1], Xuser[,2], color = "foreach runtimes"), linetype="dotted") +
+  geom_line(aes(Xuser[,1], Xuser[,3], color = "sequential runtimes"), linetype="dotted") +
+  geom_line(aes(Xuser[,1], Xuser[,4], color = "parlmice runtimes"), linetype="dotted") +
+  geom_line(aes(Xuser[,1], Xuser[,5], color = "mice.par runtimes"), linetype="dotted") +
+  scale_colour_manual("", 
+                      breaks = c("foreach runtimes", "sequential runtimes", "parlmice runtimes", "mice.par runtimes"),
+                      values = c("foreach runtimes"="red", "sequential runtimes"="blue", 
+                                 "parlmice runtimes"="green", "mice.par runtimes"="orange"))+
+  scale_linetype_manual(values=c("elapsed"="solid","system time"="dashed", "user time"="dotted"))
+
+plotu <- plotu + 
+  ggtitle("Runtime of Multiple Imputations") +
+  xlab("Number of multiple imputations M") + ylab("Runtime in seconds")
+
+plotu  
+
+#plot system cpu time
+plots <- ggplot(data = Xsystem, aes(Xsystem[,1], Xsystem[,2])) +
+  geom_point(color = "red") +
+  geom_point(aes(Xsystem[,1], Xsystem[,3]), color = "blue") +
+  geom_point(aes(Xsystem[,1], Xsystem[,4]), color = "green") +
+  geom_point(aes(Xsystem[,1], Xsystem[,5]), color = "orange") +
+  geom_line(aes(Xsystem[,1], Xsystem[,2], color = "foreach runtimes"), linetype="dashed") +
+  geom_line(aes(Xsystem[,1], Xsystem[,3], color = "sequential runtimes"), linetype="dashed") +
+  geom_line(aes(Xsystem[,1], Xsystem[,4], color = "parlmice runtimes"), linetype="dashed") +
+  geom_line(aes(Xsystem[,1], Xsystem[,5], color = "mice.par runtimes"), linetype="dashed") +
+  scale_colour_manual("", 
+                      breaks = c("foreach runtimes", "sequential runtimes", "parlmice runtimes", "mice.par runtimes"),
+                      values = c("foreach runtimes"="red", "sequential runtimes"="blue", 
+                                 "parlmice runtimes"="green", "mice.par runtimes"="orange"))+
+  scale_linetype_manual(values=c("elapsed"="solid","system time"="dashed", "user time"="dotted"))
+
+plots <- plots + 
+  ggtitle("Runtime of Multiple Imputations") +
+  xlab("Number of multiple imputations M") + ylab("Runtime in seconds")
+
+plots
+
+dev.new()
+ggarrange(plote, plotu, plots, nrow=3, ncol=1)
