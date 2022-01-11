@@ -13,6 +13,9 @@
 \usepackage{emory-theme}
 \usepackage[scaled]{helvet}
 \usepackage[T1]{fontenc}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric,calc}
+
 
 \usepackage{mwe} % for placeholder images
 
@@ -27,6 +30,18 @@
 \author{Sven Nekula, Joshua Simon and Eva Wolf}
 \institute{Otto Friedrich University, Bamberg}
 \titlegraphic{\includegraphics[width=0.06\textwidth]{img/uni_ba_logo_100_blau.png}}
+
+\newcommand\score[2]{%
+	\pgfmathsetmacro\pgfxa{#1 + 1}%
+	\tikzstyle{scorestars}=[star, star points=5, star point ratio=5, draw, inner sep=1.3pt, anchor=outer point 3]%
+	\begin{tikzpicture}[baseline]
+		\foreach \i in {1, ..., #2} {
+			\pgfmathparse{\i<=#1 ? "yellow" : "gray"}
+			\edef\starcolor{\pgfmathresult}
+			\draw (\i*1.75ex, 0) node[name=star\i, scorestars, fill=\starcolor]  {};
+		}
+	\end{tikzpicture}%
+}
 
 % begin document
 \renewcommand\familydefault{\sfdefault}
@@ -43,15 +58,8 @@
          \end{tikzfigure}
     }
     \block{Implementations in R}{
-     \textbf{foreach::foreach}
-     
-     
-\hspace*{20mm}foreach(i=1:num\_imp, .combine = ibind, t.packages="mice") \%dopar\%
-\hspace*{20mm}\{mice(data = data, m = m, maxit = maxit, printFlag = FALSE, predictorMatrix
-\hspace*{20mm} = predictorMatrix)\}
-     
-     foreach is an advanced version of the for loop that supports parallellization. 
-
+     \textbf{foreach::foreach} usability \hspace{-1mm}\small{\score{2.4}{5}}\\
+    \\
      \textbf{parlmice} 
     
      \textbf{micemd::mice.par}
@@ -63,13 +71,15 @@
 	\block{Theory}{
 	}
 	\block{Methodology}{
+	\textbf{time measurement} was done with the \textit{system.time} function, which returns 3 values: User CPU-, User System- and Elapsed time. User CPU is the time needed by the current task such as an execution in R. System CPU describes the time needed by the operating system to organize that task such as opening folders or asking for the System time. Elapsed time is the Wall Clock time that passed while the function was running.\\
+	\textbf{speed up} \\
 	}
     \column{0.36}
     \block{Results}{
         
         \vspace{1em}
         \begin{tikzfigure}[Runtime and Speedup from 1 up to 8 cores]
-            \includegraphics[width=0.9\linewidth]{img/runtime speedup 8cores parallel and fork.png}
+            \includegraphics[width=1\linewidth]{img/2022-01-11_benchmark_core_Linux_both}
         \end{tikzfigure}
         \vspace{1em}
        
