@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.23 (TeX Live 2021/W32TeX) (preloaded format=pdflatex 2021.11.26)  9 JAN 2022 13:57
+This is pdfTeX, Version 3.141592653-2.6-1.40.23 (TeX Live 2021/W32TeX) (preloaded format=pdflatex 2021.11.26)  11 JAN 2022 14:50
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -994,7 +994,18 @@ Package biblatex Info: ... file 'biblatex.cfg' found.
 (c:/texlive/2021/texmf-dist/tex/latex/biblatex/biblatex.cfg
 File: biblatex.cfg 
 ))
-(./emory-theme.sty) (c:/texlive/2021/texmf-dist/tex/latex/mwe/mwe.sty
+(./emory-theme.sty) (c:/texlive/2021/texmf-dist/tex/latex/psnfss/helvet.sty
+Package: helvet 2020/03/25 PSNFSS-v9.3 (WaS) 
+)
+(c:/texlive/2021/texmf-dist/tex/latex/base/fontenc.sty
+Package: fontenc 2021/04/29 v2.0v Standard LaTeX package
+LaTeX Font Info:    Trying to load font information for T1+aer on input line 11
+2.
+
+(c:/texlive/2021/texmf-dist/tex/latex/ae/t1aer.fd
+File: t1aer.fd 1997/11/16 Font definitions for T1/aer.
+))
+(c:/texlive/2021/texmf-dist/tex/latex/mwe/mwe.sty
 Package: mwe 2018/03/30 v0.5 Package to support minimal working examples (MWE)
 
 (c:/texlive/2021/texmf-dist/tex/latex/lipsum/lipsum.sty
@@ -1042,28 +1053,31 @@ Package: xspace 2014/10/28 v1.13 Space after command names (DPC,MH)
 ))
 \@quotelevel=\count453
 \@quotereset=\count454
-LaTeX Font Info:    Trying to load font information for T1+aer on input line 31
+LaTeX Font Info:    Trying to load font information for T1+phv on input line 33
 .
 
-(c:/texlive/2021/texmf-dist/tex/latex/ae/t1aer.fd
-File: t1aer.fd 1997/11/16 Font definitions for T1/aer.
-) (./main.aux)
+(c:/texlive/2021/texmf-dist/tex/latex/psnfss/t1phv.fd
+File: t1phv.fd 2020/03/25 scalable font definitions for T1/phv.
+)
+LaTeX Font Info:    Font shape `T1/phv/m/n' will be
+(Font)              scaled to size 19.70294pt on input line 33.
+ (./main.aux)
 \openout1 = `main.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 31.
-LaTeX Font Info:    ... okay on input line 31.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 31.
-LaTeX Font Info:    ... okay on input line 31.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 31.
-LaTeX Font Info:    ... okay on input line 31.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 31.
-LaTeX Font Info:    ... okay on input line 31.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 31.
-LaTeX Font Info:    ... okay on input line 31.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 31.
-LaTeX Font Info:    ... okay on input line 31.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 31.
-LaTeX Font Info:    ... okay on input line 31.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 33.
+LaTeX Font Info:    ... okay on input line 33.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 33.
+LaTeX Font Info:    ... okay on input line 33.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 33.
+LaTeX Font Info:    ... okay on input line 33.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 33.
+LaTeX Font Info:    ... okay on input line 33.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 33.
+LaTeX Font Info:    ... okay on input line 33.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 33.
+LaTeX Font Info:    ... okay on input line 33.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 33.
+LaTeX Font Info:    ... okay on input line 33.
 
 (c:/texlive/2021/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
@@ -1121,11 +1135,11 @@ e
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-<Emory_vt_280.png, id=29, 262.0992pt x 262.0992pt>
-File: Emory_vt_280.png Graphic file (type png)
-<use Emory_vt_280.png>
-Package pdftex.def Info: Emory_vt_280.png  used on input line 31.
-(pdftex.def)             Requested size: 202.37717pt x 202.37689pt.
+<uni_ba_logo_100_blau.png, id=29, 220.825pt x 220.825pt>
+File: uni_ba_logo_100_blau.png Graphic file (type png)
+<use uni_ba_logo_100_blau.png>
+Package pdftex.def Info: uni_ba_logo_100_blau.png  used on input line 33.
+(pdftex.def)             Requested size: 173.44093pt x 173.44908pt.
 Package biblatex Info: Trying to load language 'english'...
 Package biblatex Info: ... file 'english.lbx' found.
 (c:/texlive/2021/texmf-dist/tex/latex/biblatex/lbx/english.lbx
@@ -1152,268 +1166,102 @@ Package biblatex Info: Trying to load bibliographic data...
 Package biblatex Info: ... file 'main.bbl' found.
 
 (./main.bbl)
-Package biblatex Info: Reference section=0 on input line 31.
-Package biblatex Info: Reference segment=0 on input line 31.
+Package biblatex Info: Reference section=0 on input line 33.
+Package biblatex Info: Reference segment=0 on input line 33.
 
 Missing character: There is no 1 in font nullfont!
 Missing character: There is no = in font nullfont!
 Missing character: There is no 1 in font nullfont!
-LaTeX Font Info:    Calculating math sizes for size <42.99> on input line 33.
-
-LaTeX Font Warning: Font shape `OT1/cmr/m/n' in size <21.495> not available
-(Font)              size <20.74> substituted on input line 33.
-
-
-LaTeX Font Warning: Font shape `OML/cmm/m/it' in size <42.99> not available
-(Font)              size <24.88> substituted on input line 33.
-
-
-LaTeX Font Warning: Font shape `OML/cmm/m/it' in size <30.09286> not available
-(Font)              size <24.88> substituted on input line 33.
-
-
-LaTeX Font Warning: Font shape `OML/cmm/m/it' in size <21.495> not available
-(Font)              size <20.74> substituted on input line 33.
-
-
-LaTeX Font Warning: Font shape `OMS/cmsy/m/n' in size <42.99> not available
-(Font)              size <24.88> substituted on input line 33.
-
-
-LaTeX Font Warning: Font shape `OMS/cmsy/m/n' in size <30.09286> not available
-(Font)              size <24.88> substituted on input line 33.
-
-
-LaTeX Font Warning: Font shape `OMS/cmsy/m/n' in size <21.495> not available
-(Font)              size <20.74> substituted on input line 33.
-
-LaTeX Font Info:    Trying to load font information for U+msa on input line 33.
+LaTeX Font Info:    Font shape `T1/phv/b/n' will be
+(Font)              scaled to size 19.70294pt on input line 35.
+LaTeX Font Info:    Font shape `T1/phv/b/n' will be
+(Font)              scaled to size 49.01033pt on input line 35.
+LaTeX Font Info:    Font shape `T1/phv/m/n' will be
+(Font)              scaled to size 49.01033pt on input line 35.
+LaTeX Font Info:    Font shape `T1/phv/m/sc' will be
+(Font)              scaled to size 49.01033pt on input line 35.
+LaTeX Font Info:    Font shape `T1/phv/m/n' will be
+(Font)              scaled to size 40.84036pt on input line 35.
+LaTeX Font Info:    Font shape `T1/phv/m/n' will be
+(Font)              scaled to size 34.03839pt on input line 35.
+File: uni_ba_logo_100_blau.png Graphic file (type png)
+<use uni_ba_logo_100_blau.png>
+Package pdftex.def Info: uni_ba_logo_100_blau.png  used on input line 35.
+(pdftex.def)             Requested size: 173.44093pt x 173.44908pt.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 35.
 
 (c:/texlive/2021/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 33.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 35.
 
 
 (c:/texlive/2021/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-LaTeX Font Info:    Trying to load font information for U+rsfs on input line 33
+LaTeX Font Info:    Trying to load font information for U+rsfs on input line 35
 .
 
 (c:/texlive/2021/texmf-dist/tex/latex/jknapltx/ursfs.fd
 File: ursfs.fd 1998/03/24 rsfs font definition file (jk)
 )
+File: uni_ba_logo_100_blau.png Graphic file (type png)
+<use uni_ba_logo_100_blau.png>
+Package pdftex.def Info: uni_ba_logo_100_blau.png  used on input line 35.
+(pdftex.def)             Requested size: 173.44093pt x 173.44908pt.
+LaTeX Font Info:    Font shape `T1/phv/b/n' will be
+(Font)              scaled to size 34.03839pt on input line 44.
+LaTeX Font Info:    Font shape `T1/phv/m/n' will be
+(Font)              scaled to size 23.63593pt on input line 44.
+<cpu.png, id=31, 180.675pt x 179.2296pt>
+File: cpu.png Graphic file (type png)
+<use cpu.png>
+Package pdftex.def Info: cpu.png  used on input line 44.
+(pdftex.def)             Requested size: 420.84981pt x 417.5249pt.
+LaTeX Font Info:    Font shape `T1/phv/m/n' will be
+(Font)              scaled to size 16.41594pt on input line 44.
+LaTeX Font Info:    Font shape `T1/phv/b/n' will be
+(Font)              scaled to size 23.63593pt on input line 62.
 
-LaTeX Font Warning: Font shape `U/rsfs/m/n' in size <42.99> not available
-(Font)              size <24.88> substituted on input line 33.
+Underfull \hbox (badness 1533) in paragraph at lines 62--62
+[]| \T1/phv/m/n/24.88 fore-ach(i=1:num_imp, .com-bine = ibind, t.packages="mice
+") %dopar%
+ []
 
+<runtime speedup 8cores parallel and fork.png, id=32, 3053.4075pt x 1526.70375p
+t>
+File: runtime speedup 8cores parallel and fork.png Graphic file (type png)
+<use runtime speedup 8cores parallel and fork.png>
+Package pdftex.def Info: runtime speedup 8cores parallel and fork.png  used on 
+input line 76.
+(pdftex.def)             Requested size: 853.1553pt x 426.56561pt.
 
-LaTeX Font Warning: Font shape `U/rsfs/m/n' in size <30.09286> not available
-(Font)              size <24.88> substituted on input line 33.
-
-
-LaTeX Font Warning: Font shape `U/rsfs/m/n' in size <21.495> not available
-(Font)              size <20.74> substituted on input line 33.
-
-LaTeX Font Info:    Calculating math sizes for size <30.09286> on input line 33
-.
-
-LaTeX Font Warning: Font shape `OT1/cmr/m/n' in size <15.04643> not available
-(Font)              size <14.4> substituted on input line 33.
-
-
-LaTeX Font Warning: Font shape `OML/cmm/m/it' in size <15.04643> not available
-(Font)              size <14.4> substituted on input line 33.
-
-
-LaTeX Font Warning: Font shape `OMS/cmsy/m/n' in size <15.04643> not available
-(Font)              size <14.4> substituted on input line 33.
-
-
-LaTeX Font Warning: Font shape `U/rsfs/m/n' in size <15.04643> not available
-(Font)              size <14.4> substituted on input line 33.
-
-LaTeX Font Info:    Calculating math sizes for size <35.83> on input line 33.
-
-LaTeX Font Warning: Font shape `OT1/cmr/m/n' in size <17.915> not available
-(Font)              size <17.28> substituted on input line 33.
+LaTeX Warning: Citation 'cite:0' on page 1 undefined on input line 85.
 
 
-LaTeX Font Warning: Font shape `OML/cmm/m/it' in size <35.83> not available
-(Font)              size <24.88> substituted on input line 33.
+LaTeX Warning: Citation 'cite:4' on page 1 undefined on input line 85.
 
-
-LaTeX Font Warning: Font shape `OML/cmm/m/it' in size <17.915> not available
-(Font)              size <17.28> substituted on input line 33.
-
-
-LaTeX Font Warning: Font shape `OMS/cmsy/m/n' in size <35.83> not available
-(Font)              size <24.88> substituted on input line 33.
-
-
-LaTeX Font Warning: Font shape `OMS/cmsy/m/n' in size <17.915> not available
-(Font)              size <17.28> substituted on input line 33.
-
-
-LaTeX Font Warning: Font shape `U/rsfs/m/n' in size <35.83> not available
-(Font)              size <24.88> substituted on input line 33.
-
-
-LaTeX Font Warning: Font shape `U/rsfs/m/n' in size <17.915> not available
-(Font)              size <17.28> substituted on input line 33.
-
-LaTeX Font Info:    Calculating math sizes for size <25.08089> on input line 33
-.
-
-LaTeX Font Warning: Font shape `OT1/cmr/m/n' in size <12.54044> not available
-(Font)              size <12> substituted on input line 33.
-
-
-LaTeX Font Warning: Font shape `OML/cmm/m/it' in size <12.54044> not available
-(Font)              size <12> substituted on input line 33.
-
-
-LaTeX Font Warning: Font shape `OMS/cmsy/m/n' in size <12.54044> not available
-(Font)              size <12> substituted on input line 33.
-
-
-LaTeX Font Warning: Font shape `U/rsfs/m/n' in size <12.54044> not available
-(Font)              size <12> substituted on input line 33.
-
-File: Emory_vt_280.png Graphic file (type png)
-<use Emory_vt_280.png>
-Package pdftex.def Info: Emory_vt_280.png  used on input line 33.
-(pdftex.def)             Requested size: 202.37717pt x 202.37689pt.
-File: Emory_vt_280.png Graphic file (type png)
-<use Emory_vt_280.png>
-Package pdftex.def Info: Emory_vt_280.png  used on input line 33.
-(pdftex.def)             Requested size: 202.37717pt x 202.37689pt.
-
-LaTeX Warning: Citation 'cite:0' on page 1 undefined on input line 38.
-
-
-LaTeX Warning: Citation 'cite:2' on page 1 undefined on input line 47.
-
-
-LaTeX Warning: Citation 'cite:2' on page 1 undefined on input line 47.
-
-
-LaTeX Warning: Citation 'cite:3' on page 1 undefined on input line 47.
-
-
-LaTeX Warning: Citation 'cite:4' on page 1 undefined on input line 47.
-
-
-LaTeX Warning: Citation 'cite:5' on page 1 undefined on input line 47.
-
-LaTeX Font Info:    Trying to load font information for U+euf on input line 47.
+LaTeX Font Info:    Trying to load font information for U+euf on input line 85.
 
 (c:/texlive/2021/texmf-dist/tex/latex/amsfonts/ueuf.fd
 File: ueuf.fd 2013/01/14 v3.01 Euler Fraktur
 )
-
-LaTeX Warning: Citation 'cite:0' on page 1 undefined on input line 47.
-
-
-LaTeX Warning: Citation 'cite:4' on page 1 undefined on input line 47.
-
-
-LaTeX Warning: Citation 'cite:2' on page 1 undefined on input line 47.
-
-
-LaTeX Warning: Citation 'cite:0' on page 1 undefined on input line 47.
-
-
-LaTeX Warning: Citation 'cite:4' on page 1 undefined on input line 47.
-
-
-LaTeX Warning: Citation 'cite:5' on page 1 undefined on input line 57.
-
-
-LaTeX Warning: Citation 'cite:2' on page 1 undefined on input line 57.
-
-
-LaTeX Warning: Citation 'cite:3' on page 1 undefined on input line 57.
-
-
-LaTeX Warning: Citation 'cite:1' on page 1 undefined on input line 57.
-
-
-LaTeX Warning: Citation 'cite:0' on page 1 undefined on input line 57.
-
-
-LaTeX Warning: Citation 'cite:2' on page 1 undefined on input line 70.
-
-
-LaTeX Warning: Citation 'cite:0' on page 1 undefined on input line 70.
-
-
-LaTeX Warning: Citation 'cite:0' on page 1 undefined on input line 70.
-
-
-LaTeX Warning: Citation 'cite:3' on page 1 undefined on input line 70.
-
-
-LaTeX Warning: Citation 'cite:5' on page 1 undefined on input line 70.
-
-
-LaTeX Warning: Citation 'cite:1' on page 1 undefined on input line 70.
-
-<example-image.pdf, id=31, 321.2pt x 240.9pt>
+<example-image.pdf, id=33, 321.2pt x 240.9pt>
 File: example-image.pdf Graphic file (type pdf)
 <use example-image.pdf>
-Package pdftex.def Info: example-image.pdf  used on input line 70.
-(pdftex.def)             Requested size: 853.1553pt x 639.88902pt.
-
-LaTeX Warning: Citation 'cite:4' on page 1 undefined on input line 70.
-
-
-LaTeX Warning: Citation 'cite:3' on page 1 undefined on input line 70.
-
-
-LaTeX Warning: Citation 'cite:0' on page 1 undefined on input line 70.
-
-
-LaTeX Warning: Citation 'cite:5' on page 1 undefined on input line 70.
-
-
-LaTeX Warning: Citation 'cite:4' on page 1 undefined on input line 70.
-
-
-LaTeX Warning: Citation 'cite:0' on page 1 undefined on input line 79.
-
-
-LaTeX Warning: Citation 'cite:4' on page 1 undefined on input line 79.
-
-File: example-image.pdf Graphic file (type pdf)
-<use example-image.pdf>
-Package pdftex.def Info: example-image.pdf  used on input line 79.
+Package pdftex.def Info: example-image.pdf  used on input line 85.
 (pdftex.def)             Requested size: 415.15935pt x 311.37982pt.
-
-LaTeX Warning: Citation 'cite:3' on page 1 undefined on input line 83.
-
-
-LaTeX Warning: Citation 'cite:2' on page 1 undefined on input line 83.
+LaTeX Font Info:    Font shape `T1/phv/m/n' will be
+(Font)              scaled to size 13.67995pt on input line 96.
 
 
-LaTeX Warning: Citation 'cite:1' on page 1 undefined on input line 83.
-
-
-LaTeX Warning: Citation 'cite:4' on page 1 undefined on input line 83.
-
-
-LaTeX Warning: Empty bibliography on input line 94.
+LaTeX Warning: Empty bibliography on input line 96.
 
 [1
 
-{c:/texlive/2021/texmf-var/fonts/map/pdftex/updmap/pdftex.map} <./Emory_vt_280.
-png> <c:/texlive/2021/texmf-dist/tex/latex/mwe/example-image.pdf>]
-(./main.aux)
-
-LaTeX Font Warning: Size substitutions with differences
-(Font)              up to 18.11pt have occurred.
-
+{c:/texlive/2021/texmf-var/fonts/map/pdftex/updmap/pdftex.map} <./uni_ba_logo_1
+00_blau.png> <./cpu.png> <./runtime speedup 8cores parallel and fork.png> <c:/t
+exlive/2021/texmf-dist/tex/latex/mwe/example-image.pdf>] (./main.aux)
 
 LaTeX Warning: There were undefined references.
 
@@ -1427,28 +1275,25 @@ Package logreq Info: Writing requests to 'main.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 28286 strings out of 478353
- 593606 string characters out of 5852100
- 1440019 words of memory out of 5000000
- 45868 multiletter control sequences out of 15000+600000
- 456665 words of font info for 154 fonts, out of 8000000 for 9000
+ 28276 strings out of 478353
+ 594263 string characters out of 5852100
+ 1422161 words of memory out of 5000000
+ 45872 multiletter control sequences out of 15000+600000
+ 448016 words of font info for 90 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 115i,17n,118p,1006b,2811s stack positions out of 5000i,500n,10000p,200000b,80000s
-<c:/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmb10.pfb><c:/texl
-ive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb><c:/texlive/2021/
-texmf-dist/fonts/type1/public/amsfonts/cm/cmcsc10.pfb><c:/texlive/2021/texmf-di
-st/fonts/type1/public/amsfonts/cm/cmex10.pfb><c:/texlive/2021/texmf-dist/fonts/
-type1/public/amsfonts/cm/cmmi12.pfb><c:/texlive/2021/texmf-dist/fonts/type1/pub
-lic/amsfonts/cm/cmr17.pfb><c:/texlive/2021/texmf-dist/fonts/type1/public/amsfon
-ts/cm/cmsy10.pfb><c:/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmt
-i12.pfb><c:/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/euler/eufm10.pf
-b><c:/texlive/2021/texmf-dist/fonts/type1/public/lm/lmss17.pfb><c:/texlive/2021
-/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb><c:/texlive/2021/tex
-mf-dist/fonts/type1/public/rsfs/rsfs10.pfb>
-Output written on main.pdf (1 page, 205873 bytes).
+ 115i,11n,118p,737b,2810s stack positions out of 5000i,500n,10000p,200000b,80000s
+{c:/texlive/2021/texmf-dist/fonts/enc/dvips/base/8r.enc}<c:/texlive/2021/texm
+f-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb><c:/texlive/2021/texmf-dist/fo
+nts/type1/public/amsfonts/cm/cmr17.pfb><c:/texlive/2021/texmf-dist/fonts/type1/
+public/amsfonts/cm/cmsy10.pfb><c:/texlive/2021/texmf-dist/fonts/type1/public/am
+sfonts/euler/eufm10.pfb><c:/texlive/2021/texmf-dist/fonts/type1/public/lm/lmss1
+7.pfb><c:/texlive/2021/texmf-dist/fonts/type1/public/rsfs/rsfs10.pfb><c:/texliv
+e/2021/texmf-dist/fonts/type1/urw/helvetic/uhvb8a.pfb><c:/texlive/2021/texmf-di
+st/fonts/type1/urw/helvetic/uhvr8a.pfb>
+Output written on main.pdf (1 page, 495834 bytes).
 PDF statistics:
- 101 PDF objects out of 1000 (max. 8388607)
- 55 compressed objects within 1 object stream
+ 86 PDF objects out of 1000 (max. 8388607)
+ 44 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 119 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 129 words of extra memory for PDF output out of 10000 (max. 10000000)
 
