@@ -40,3 +40,6 @@ vignettes/*.pdf
 
 # C++ source directory
 /src/C++
+
+# Other cache files and objects
+.DS_Store
