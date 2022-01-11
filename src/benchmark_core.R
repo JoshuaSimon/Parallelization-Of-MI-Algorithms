@@ -350,7 +350,7 @@ main <- function() {
         os_test <- TRUE
         runtime_data <- benmark_imputation(
             data = data, num_imp = 128,
-            cores = cores, runs = 5,
+            cores = cores, runs = 1,
             os_test = os_test)
     } else {
         stop("Your OS is not supported by this benchmark.")
@@ -358,7 +358,7 @@ main <- function() {
 
     # Save the benchmark and session data as an .RData object.
     filename <- paste0("data/", Sys.Date(), "_benchmark_core_", os_name, ".RData")
-    save(runtime_data, os_name, file = filename)
+    save(runtime_data, os_name, os_test, cores, file = filename)
 
     # Plot the results.
     plot_runtime <- benmark_plot(runtime_data, cores,
@@ -380,7 +380,7 @@ main <- function() {
     ggsave(filename = filename, plot = plot_speed_up)
 
     filename <- paste0("img/", Sys.Date(), "_benchmark_core_", os_name, "_both.png")
-    ggsave(filename = filename, plot = plot_together)
+    ggsave(filename = filename, plot = plot_together, width = 10, height = 5)
 }
 
 
