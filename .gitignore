@@ -43,3 +43,4 @@ vignettes/*.pdf
 
 # Other cache files and objects
 .DS_Store
+.vscode
