@@ -39,13 +39,14 @@ vignettes/*.pdf
 .Renviron
 
 # C++ source directory
-/src/C++
+/src/C++/eigen-3.4.0
+*.out
 
 # Other cache files and objects
 .DS_Store
 .vscode
 
-# poster
+# LaTeX poster
 /poster/*.aux
 /poster/*.bbl
 /poster/*.bcf
