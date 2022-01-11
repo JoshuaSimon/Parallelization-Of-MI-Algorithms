@@ -44,3 +44,12 @@ vignettes/*.pdf
 # Other cache files and objects
 .DS_Store
 .vscode
+
+# poster
+/poster/*.aux
+/poster/*.bbl
+/poster/*.bcf
+/poster/*.blg
+/poster/*.log
+/poster/*.run.xml
+/poster/*.synctex.gz
