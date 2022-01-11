@@ -83,7 +83,7 @@ furrrImp <- function(x, m){
   return(imp)
 }
 
-imputations <- c(4, seq(16, 128, 16))
+imputations <- c(detectCores(), seq(16, 128, 16))
 
 miceTimes <- list()
 parlmiceTimes <- list()
@@ -172,12 +172,12 @@ impSpeedup <- data.frame(
 runtimePlot <- ggplot(data = impTimes, aes(x = M, y = Runtime, color = Method)) + 
   geom_line() + 
   geom_point() +
-  scale_x_continuous(breaks = c(4, seq(16, 128, 16)))
+  scale_x_continuous(breaks = c(detectCores(), seq(16, 128, 16)))
 
 speedupPlot <- ggplot(data = impSpeedup, aes(x = M, y = Speedup, color = Method)) + 
   geom_line() + 
   geom_point() +
-  scale_x_continuous(breaks = c(4, seq(16, 128, 16)))
+  scale_x_continuous(breaks = c(detectCores(), seq(16, 128, 16)))
 
 # plot both next to each other
 ggarrange(runtimePlot, speedupPlot, ncol = 2, nrow = 1)
