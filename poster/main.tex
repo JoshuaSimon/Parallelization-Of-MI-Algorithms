@@ -14,6 +14,7 @@
 \usepackage[scaled]{helvet}
 \usepackage[T1]{fontenc}
 \usepackage{tikz}
+\usepackage{wrapfig}
 \usetikzlibrary{shapes.geometric,calc}
 
 
@@ -67,12 +68,14 @@
      \textbf{parallel::parLapply}
           
      \textbf{purrr::future\_map} 
-  }
+}
 	\block{Theory}{
 	}
 	\block{Methodology}{
+	\textbf{data generation} We used a simple data generator of normally distributed random variables. The data set created contains 10 variables, of which some depend on each other. The sample size created was n 10000. Expermients were compared to euqal settings with real data, and the results did not change the direction of the results. More complex data favor the mechanism of parallelization.\\
 	\textbf{time measurement} was done with the \textit{system.time} function, which returns 3 values: User CPU-, User System- and Elapsed time. User CPU is the time needed by the current task such as an execution in R. System CPU describes the time needed by the operating system to organize that task such as opening folders or asking for the System time. Elapsed time is the Wall Clock time that passed while the function was running.\\
-	\textbf{speed up} \\
+	\textbf{mice method} The method of the mice algorithm was set on defaut, pmm.\\
+	\textbf{speed up}The speed\_up value is calculated by the serial time (runtime without parallelization) divided by the runtime of the current parallelization implementation. Values below one show that the parallelized run took longer than the serial run.\\
 	}
     \column{0.36}
     \block{Results}{
@@ -83,6 +86,11 @@
         \end{tikzfigure}
         \vspace{1em}
        
+       \vspace{1em}
+       \begin{tikzfigure}[Runtime and Speedup from 1 up to 8 cores]
+       	\includegraphics[width=1\linewidth]{img/different_m_comparison}
+       \end{tikzfigure}
+       \vspace{1em}
     }
 
     \column{0.32}
@@ -95,9 +103,11 @@
     }
     
     \block{Application}{
-      \textbf{disk framing} 
-    }
-    
+    For \textbf{disk framing}, parallelization is a useful tool to decrease computation time. Disk framing seperated larger-than-RAM datsets into several chunks of data, which are then treated seperately for the task to perform. Afterwords, results are merged again. Through parallelization, chunks of data can be processed parallely and so calculation time is reduced.
+     \begin{wrapfigure}{r}{6cm}
+     	\includegraphics[width=6cm]{img/disk.framing}
+     \end{wrapfigure}
+}
     \block{References}{
         \vspace{-1em}
         \begin{footnotesize}
