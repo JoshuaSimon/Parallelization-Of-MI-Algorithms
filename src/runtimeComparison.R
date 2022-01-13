@@ -22,7 +22,7 @@ miceTime <- system.time(mice(data = dat,
                              seed = seed))
 
 # foreach
-feTime <- system.time(foreach_wrap_alt(data = dat, 
+feTime <- system.time(foreach_wrap(data = dat, 
                                        num_imp = 48, 
                                        seed = seed, 
                                        num_cores = detectCores(), 
@@ -36,7 +36,7 @@ parLTime <- system.time(parLapply_wrap(data = dat,
                                        backend = "PSOCK"))
 
 # furrr
-furrrTime <- system.time(furrr_wrap_alt(data = dat, 
+furrrTime <- system.time(furrr_wrap(data = dat, 
                                         num_imp = 48, 
                                         num_cores = detectCores(), 
                                         seed = seed, 

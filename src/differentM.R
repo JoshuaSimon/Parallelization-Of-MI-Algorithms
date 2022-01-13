@@ -47,7 +47,7 @@ for (i in imputations){
   
   # foreach
   foreachTimes <- c(foreachTimes,
-                    system.time(foreach_wrap_alt(data = dat,
+                    system.time(foreach_wrap(data = dat,
                                                  num_imp = i,
                                                  seed = seed,
                                                  num_cores = nCores,
@@ -63,7 +63,7 @@ for (i in imputations){
   
   # furrr
   furrrTimes <- c(furrrTimes,
-                  system.time(furrr_wrap_alt(data = dat, 
+                  system.time(furrr_wrap(data = dat, 
                                              num_imp = i,
                                              seed = seed,
                                              num_cores = nCores,

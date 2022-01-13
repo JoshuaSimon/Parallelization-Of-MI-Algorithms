@@ -81,7 +81,7 @@ benmark_imputation <- function(data, num_imp, cores, runs = 5, os_test = FALSE) 
                 # Parallel run with foreach.
                 run_foreach_time_fork[run] <- mice_timer(
                     #fun = foreach_wrap, fun_name = "foreach",
-                    fun = foreach_wrap_alt, fun_name = "foreach",
+                    fun = foreach_wrap, fun_name = "foreach",
                     data = data, num_imp = num_imp,
                     seed = seed, num_cores = num_cores,
                     backend = "FORK", exe_type = "parallel", print_flag = TRUE)
@@ -105,7 +105,7 @@ benmark_imputation <- function(data, num_imp, cores, runs = 5, os_test = FALSE) 
             # Parallel run with foreach.
             run_foreach_time[run] <- mice_timer(
                 #fun = foreach_wrap, fun_name = "foreach",
-                fun = foreach_wrap_alt, fun_name = "foreach",
+                fun = foreach_wrap, fun_name = "foreach",
                 data = data, num_imp = num_imp,
                 seed = seed, num_cores = num_cores,
                 backend = "PSOCK", exe_type = "parallel", print_flag = TRUE)
