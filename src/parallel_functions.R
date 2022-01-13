@@ -107,6 +107,25 @@ furrr_wrap <- function(data, num_imp, seed, num_cores, backend) {
     }
 }
 
+# Alternative wrapper function for a parallel call of mice using the furrr
+# function. Using num_cores instead of num_imp in rep() and m = num_imp / num_cores
+# speeds up the function significantly.
+furrr_wrap_alt <- function(data, num_imp, seed, num_cores, backend) {
+    plan(multisession, workers = num_cores)
+    imps <- future_map(rep(1, num_cores), ~mice(data = data, m = num_imp / num_cores,
+                                                maxit = 5,
+                                                seed = seed,
+                                                printFlag = FALSE))
+    imp <- imps[[1]]
+    if (length(imps) >= 2) {
+        for (i in 2:length(imps)) {
+            imp <- ibind(imp, imps[[i]])
+        }
+        return(imp)
+    } else if (length(imps) == 1) {
+        return(imp)
+    }
+}
 
 # Wrapper function for a parallel call of mice using the par.mice
 # function.
