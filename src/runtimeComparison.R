@@ -11,82 +11,59 @@ dat <- dataGenerator()
 seed <- 42
 nCores <- detectCores()
 
-# mice
-miceImp <- function(x){
-  imp <- mice(data = x, m = 48, 
-              maxit = 5, seed = seed, printFlag = FALSE)
-  return(imp)
-}
 
-miceTime <- system.time(miceImp(dat))
+source("parallel_functions.R")
+
+# mice
+miceTime <- system.time(mice(data = dat, 
+                             m = 48, 
+                             maxit = 5, 
+                             printFlag = FALSE, 
+                             seed = seed))
 
 # foreach
-feImp <- function(x){
-  seed <- 42
-  nCores <- detectCores()
-  cl <- makeCluster(nCores)
-  clusterSetRNGStream(cl, seed)
-  registerDoParallel(cl)
-  imp <- foreach(i=1:48, .combine=ibind) %dopar% {
-    library(mice)
-    mice(data = x, m = 1, maxit = 5, 
-         seed = seed, printFlag = FALSE)
-  }
-  stopCluster(cl)
-  return(imp)
-}
-
-
-feTime <- system.time(feImp(dat))
+feTime <- system.time(foreach_wrap_alt(data = dat, 
+                                       num_imp = 48, 
+                                       seed = seed, 
+                                       num_cores = detectCores(), 
+                                       backend = "PSOCK"))
 
 # parlapply
-parLImp <- function(x){
-  seed <- 42
-  nCores <- detectCores()
-  cl <- makeCluster(nCores)
-  clusterSetRNGStream(cl, seed)
-  clusterExport(cl=cl, varlist=c("x", "seed", "nCores"),
-                envir=environment())
-  clusterEvalQ(cl, library(mice))
-  
-  imps <- parLapply(cl, X = 1:nCores, function(none){
-    mice(data = x, m = (48/nCores), maxit = 5, 
-         seed = seed, printFlag = FALSE)
-  })
-  stopCluster(cl)
-  imp <- imps[[1]]
-  for (i in 2:length(imps)){
-    imp <- ibind(imp, imps[[i]])
-  }
-  return(imp)
-}
-
-parLTime <- system.time(parLImp(dat))
+parLTime <- system.time(parLapply_wrap(data = dat,
+                                       num_imp = 48,
+                                       num_cores = detectCores(),
+                                       seed = seed, 
+                                       backend = "PSOCK"))
 
 # furrr
-furrrImp <- function(x){
-  seed <- 42
-  nCores <- detectCores()
-  plan(multisession, workers = nCores)
-  imps <- future_map(rep(1, 48), ~mice(data = x, m = 1, 
-                                       maxit = 5, 
-                                       seed = seed,
-                                       printFlag = FALSE))
-  imp <- imps[[1]]
-  for(i in 2:length(imps)){
-    imp <- ibind(imp, imps[[i]])
-  }
-  return(imp)
-}
-
-furrrTime <- system.time(furrrImp(dat))
+furrrTime <- system.time(furrr_wrap_alt(data = dat, 
+                                        num_imp = 48, 
+                                        num_cores = detectCores(), 
+                                        seed = seed, 
+                                        backend = "PSOCK"))
 
 
 # checking integrity of imputations
-miceImputation <- complete(miceImp(dat))
-feImputation <- complete(feImp(dat))
-parLImputation <- complete(parLImp(dat))
-furrrImputation <- complete(furrrImp(dat))
+miceImputation <- complete(mice(data = dat, 
+                                m = 48, 
+                                maxit = 5, 
+                                printFlag = FALSE, 
+                                seed = seed))
+feImputation <- complete(foreach_wrap_alt(data = dat, 
+                                          num_imp = 48, 
+                                          seed = seed, 
+                                          num_cores = detectCores(), 
+                                          backend = "PSOCK"))
+parLImputation <- complete(parLapply_wrap(data = dat,
+                                          num_imp = 48,
+                                          num_cores = detectCores(),
+                                          seed = seed, 
+                                          backend = "PSOCK"))
+furrrImputation <- complete(furrr_wrap_alt(data = dat, 
+                                           num_imp = 48, 
+                                           num_cores = detectCores(), 
+                                           seed = seed, 
+                                           backend = "PSOCK"))
 
 summary(miceImputation$x_10)
 summary(feImputation$x_10)

@@ -63,11 +63,11 @@ for (i in imputations){
   
   # furrr
   furrrTimes <- c(furrrTimes,
-                  system.time(furrr_wrap(data = dat, 
-                                         num_imp = i,
-                                         seed = seed,
-                                         num_cores = nCores,
-                                         backend = "PSOCK")))
+                  system.time(furrr_wrap_alt(data = dat, 
+                                             num_imp = i,
+                                             seed = seed,
+                                             num_cores = nCores,
+                                             backend = "PSOCK")))
   
   
   print(paste0("Finished ", i, " imputations."))
