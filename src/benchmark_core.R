@@ -48,20 +48,19 @@ benmark_imputation <- function(data, num_imp, cores, runs = 5, os_test = FALSE) 
     run_micemd_time <- numeric(length(runs))
     run_furrr_time <- numeric(length(runs))
 
-    print(paste0("Starting ", runs, " benchmark runs for M = ", num_imp, " multiple imputations."))
+    print(paste0(
+        "Starting ", runs, " benchmark runs for M = ", num_imp,
+        " multiple imputations.")
+    )
     seed <- 42
 
     # Serial runs.
     for (run in 1:runs) {
-        time_start_seq <- Sys.time()
-        result_seq <- mice(data, m = num_imp, maxit = 5,
-                            printFlag = FALSE, seed = seed)
-        time_end_seq <- Sys.time()
-        time_taken_seq <- difftime(time_end_seq, time_start_seq, units = "secs")
-        run_serial_time[run] <- as.numeric(time_taken_seq)
-        print(paste0("Runtime in serial execution (mice) is ", time_taken_seq, " seconds."))
-
-        assert_output(result_seq, num_imp)
+        run_serial_time[run] <- mice_timer(
+            fun = mice_wrap, fun_name = "mice",
+            data = data, num_imp = num_imp,
+            seed = seed, num_cores = num_cores,
+            backend = NULL, exe_type = "serial", print_flag = TRUE)
     }
 
     serial_time <- rep(mean(run_serial_time), length(cores))
@@ -70,112 +69,75 @@ benmark_imputation <- function(data, num_imp, cores, runs = 5, os_test = FALSE) 
     for (i in 1:length(cores)) {
         num_cores <- cores[i]
         cat("\n")
-        print(paste0("Running M = ", num_imp, " multiple imputations on ", num_cores, " core(s)."))
+        print(paste0(
+            "Running M = ", num_imp,
+            " multiple imputations on ", num_cores, " core(s).")
+        )
 
         for (run in 1:runs) {
             # Perform parallel backend benchmark. This is only possible on
             # Linux or MacOS.
             if (os_test) {
-                 # Parallel run with foreach.
-                time_start <- Sys.time()
-                result_foreach <- foreach_wrap(data = data,
-                                        num_imp = num_imp, seed = seed,
-                                        num_cores = num_cores, backend = "FORK")
-                time_end <- Sys.time()
-                time_taken <- difftime(time_end, time_start, units = "secs")
-                run_foreach_time_fork[run] <- as.numeric(time_taken)
-                print(paste0("Runtime in parallel execution (foreach [FORK]) is ", time_taken, " seconds."))
-
-                assert_output(result_foreach, num_imp)
+                # Parallel run with foreach.
+                run_foreach_time_fork[run] <- mice_timer(
+                    #fun = foreach_wrap, fun_name = "foreach",
+                    fun = foreach_wrap_alt, fun_name = "foreach",
+                    data = data, num_imp = num_imp,
+                    seed = seed, num_cores = num_cores,
+                    backend = "FORK", exe_type = "parallel", print_flag = TRUE)
 
                 # Parallel run with built-in mice function.
-                time_start <- Sys.time()
-                result_parlmice <- parlmice_wrap(data = data, m = num_imp,
-                                                cluster.seed = seed,
-                                                n.core = num_cores,
-                                                n.imp.core = ceiling(num_imp / num_cores),
-                                                cl.type = "FORK")
-                time_end <- Sys.time()
-                time_taken <- difftime(time_end, time_start, units = "secs")
-                run_parlmice_time_fork[run] <- as.numeric(time_taken)
-                print(paste0("Runtime in parallel execution (parlmice [FORK]) is ", time_taken, " seconds."))
-
-                assert_output(result_parlmice, num_imp)
+                run_parlmice_time_fork[run] <- mice_timer(
+                    fun = parlmice_wrap, fun_name = "parlmice",
+                    data = data, num_imp = num_imp,
+                    seed = seed, num_cores = num_cores,
+                    backend = "FORK", exe_type = "parallel", print_flag = TRUE,
+                    n.imp.core = ceiling(num_imp / num_cores))
 
                 # Parallel run with parlapply function.
-                time_start <- Sys.time()
-                result_parlapply <- parLapply_wrap(data = data,
-                                                num_imp = num_imp,
-                                                seed = seed,
-                                                num_cores = num_cores,
-                                                backend = "FORK")
-                time_end <- Sys.time()
-                time_taken <- difftime(time_end, time_start, units = "secs")
-                run_parlapply_time_fork[run] <- as.numeric(time_taken)
-                print(paste0("Runtime in parallel execution (parLapply [FORK]) is ", time_taken, " seconds."))
-
-                assert_output(result_parlapply, num_imp)
+                run_parlapply_time_fork[run] <- mice_timer(
+                    fun = parLapply_wrap, fun_name = "parLapply",
+                    data = data, num_imp = num_imp,
+                    seed = seed, num_cores = num_cores,
+                    backend = "FORK", exe_type = "parallel", print_flag = TRUE)
             }
 
             # Parallel run with foreach.
-            time_start <- Sys.time()
-            result_foreach <- foreach_wrap(data = data,
-                                    num_imp = num_imp, seed = seed,
-                                    num_cores = num_cores, backend = "PSOCK")
-            time_end <- Sys.time()
-            time_taken <- difftime(time_end, time_start, units = "secs")
-            run_foreach_time[run] <- as.numeric(time_taken)
-            print(paste0("Runtime in parallel execution (foreach [PSOCK]) is ", time_taken, " seconds."))
-
-            assert_output(result_foreach, num_imp)
+            run_foreach_time[run] <- mice_timer(
+                #fun = foreach_wrap, fun_name = "foreach",
+                fun = foreach_wrap_alt, fun_name = "foreach",
+                data = data, num_imp = num_imp,
+                seed = seed, num_cores = num_cores,
+                backend = "PSOCK", exe_type = "parallel", print_flag = TRUE)
 
             # Parallel run with built-in mice function.
-            time_start <- Sys.time()
-            result_parlmice <- parlmice_wrap(data = data, m = num_imp,
-                                            cluster.seed = seed,
-                                            n.core = num_cores,
-                                            n.imp.core = ceiling(num_imp / num_cores),
-                                            cl.type = "PSOCK")
-            time_end <- Sys.time()
-            time_taken <- difftime(time_end, time_start, units = "secs")
-            run_parlmice_time[run] <- as.numeric(time_taken)
-            print(paste0("Runtime in parallel execution (parlmice [PSOCK]) is ", time_taken, " seconds."))
-
-            assert_output(result_parlmice, num_imp)
+            run_parlmice_time[run] <- mice_timer(
+                fun = parlmice_wrap, fun_name = "parlmice",
+                data = data, num_imp = num_imp,
+                seed = seed, num_cores = num_cores,
+                backend = "PSOCK", exe_type = "parallel", print_flag = TRUE,
+                n.imp.core = ceiling(num_imp / num_cores))
 
             # Parallel run with parlapply.
-            time_start <- Sys.time()
-            result_parlapply <- parLapply_wrap(data = data, num_imp = num_imp,
-                                            seed = seed, num_cores = num_cores,
-                                            backend = "PSOCK")
-            time_end <- Sys.time()
-            time_taken <- difftime(time_end, time_start, units = "secs")
-            run_parlapply_time[run] <- as.numeric(time_taken)
-            print(paste0("Runtime in parallel execution (parLapply [PSOCK]) is ", time_taken, " seconds."))
-
-            assert_output(result_parlapply, num_imp)
+            run_parlapply_time[run] <- mice_timer(
+                fun = parLapply_wrap, fun_name = "parLapply",
+                data = data, num_imp = num_imp,
+                seed = seed, num_cores = num_cores,
+                backend = "PSOCK", exe_type = "parallel", print_flag = TRUE)
 
             # Parallel run with parallel mice function from micemd package.
-            time_start <- Sys.time()
-            result_micepar <- mice.par(don.na = data, m = num_imp,
-                                     maxit = 5, seed = seed, nnodes = num_cores)
-            time_end <- Sys.time()
-            time_taken <- difftime(time_end, time_start, units = "secs")
-            run_micemd_time[run] <- as.numeric(time_taken)
-            print(paste0("Runtime in parallel execution (mice.par) is ", time_taken, " seconds."))
-
-            assert_output(result_micepar, num_imp)
+            run_micemd_time[run] <- mice_timer(
+                fun = micemd_wrap, fun_name = "mice.par",
+                data = data, num_imp = num_imp,
+                seed = seed, num_cores = num_cores,
+                backend = NULL, exe_type = "parallel", print_flag = TRUE)
 
             # Parallel run with furrr.
-            time_start <- Sys.time()
-            result_furrr <- furrr_wrap(data = data, num_imp = num_imp,
-                                        seed = seed, num_cores = num_cores)
-            time_end <- Sys.time()
-            time_taken <- difftime(time_end, time_start, units = "secs")
-            run_furrr_time[run] <- as.numeric(time_taken)
-            print(paste0("Runtime in parallel execution (furrr) is ", time_taken, " seconds."))
-
-            assert_output(result_furrr, num_imp)
+            run_furrr_time[run] <- mice_timer(
+                fun = furrr_wrap, fun_name = "furrr",
+                data = data, num_imp = num_imp,
+                seed = seed, num_cores = num_cores,
+                backend = NULL, exe_type = "parallel", print_flag = TRUE)
         }
 
         # Calculate average run time per core.
@@ -380,7 +342,7 @@ main <- function() {
     ggsave(filename = filename, plot = plot_speed_up)
 
     filename <- paste0("img/", Sys.Date(), "_benchmark_core_", os_name, "_both.png")
-    ggsave(filename = filename, plot = plot_together, width = 10, height = 5)
+    ggsave(filename = filename, plot = plot_together, width = 12, height = 5)
 }
 
 

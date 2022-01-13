@@ -32,3 +32,26 @@ assert_output <- function(mids_object, num_imp) {
         mids_object$m == num_imp
     )
 }
+
+
+# Timer function to measure the runtime of mice calls from
+# different mice wrapper functions. This function also
+# assserts the output produced by the mice calls. The runtime
+# in seconds is returned as a single value.
+mice_timer <- function(fun, fun_name, data, num_imp, seed, num_cores, backend, exe_type, print_flag = TRUE, ...) {
+    time_start <- Sys.time()
+    imp_result <- fun(data, num_imp, seed, num_cores, backend, ...)
+    time_end <- Sys.time()
+    time_taken <- difftime(time_end, time_start, units = "secs")
+
+    if (print_flag) {
+        print(paste0(
+            "Runtime in ", exe_type, " execution (", fun_name,
+            " [", backend, "]) is ", time_taken, " seconds.")
+        )
+    }
+
+    assert_output(imp_result, num_imp)
+
+    return(as.numeric(time_taken))
+}

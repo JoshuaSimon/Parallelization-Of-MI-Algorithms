@@ -3,7 +3,8 @@
 .Rapp.history
 
 # Session Data files
-#.RData
+/src/*.RData
+/src/.RData
 
 # User-specific files
 .Ruserdata
@@ -51,6 +52,8 @@ vignettes/*.pdf
 /poster/*.bbl
 /poster/*.bcf
 /poster/*.blg
+/poster/*.fdb_latexmk
+/poster/*.fls
 /poster/*.log
 /poster/*.run.xml
 /poster/*.synctex.gz

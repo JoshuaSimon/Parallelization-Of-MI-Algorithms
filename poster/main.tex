@@ -64,7 +64,11 @@
 	\textbf{data generation} We used a simple data generator of normally distributed random variables. The data set created contains 10 variables, of which some depend on each other. The sample size created was n 10000. Expermients were compared to euqal settings with real data, and the results did not change the direction of the results. More complex data favor the mechanism of parallelization.\\
 	\textbf{time measurement} was done with the \textit{system.time} function, which returns 3 values: User CPU-, User System- and Elapsed time. User CPU is the time needed by the current task such as an execution in R. System CPU describes the time needed by the operating system to organize that task such as opening folders or asking for the System time. Elapsed time is the Wall Clock time that passed while the function was running.\\
 	\textbf{mice method} The method of the mice algorithm was set on defaut, pmm.\\
+<<<<<<< HEAD
 	\textbf{speed up} The speed\_up value is calculated by the serial time (runtime without parallelization) divided by the runtime of the current parallelization implementation. Values below one show that the parallelized run took longer than the serial run.\\
+=======
+	\textbf{speed up}The speed\_up value is calculated by the serial time (runtime without parallelization) divided by the runtime of the current parallelization implementation \cite{cite:chapple2016mastering}. Values below one show that the parallelized run took longer than the serial run.\\
+>>>>>>> 0538817df8794da920316550a26f42cb787c105b
 	}
     \column{0.36}
     \block{Results}{
@@ -83,6 +87,7 @@
     }
 
     \column{0.32}
+<<<<<<< HEAD
     \block{Comparison of Implementations}{
     	
     	\textbf{foreach::foreach} usability \hspace{-1mm}\small{\score{2.4}{5}} \hspace{1cm} runtime\hspace{-1mm}\small{\score{2.4}{5}}\\
@@ -99,6 +104,14 @@
     	\textbf{purrr::future\_map} usability
     	\hspace{-1mm}\small{\score{2.4}{5}}\\ 
     	\\
+=======
+    \block{Comparison}{
+        Recent developments in symbolic group theory \cite{cite:norman2016parallel} have raised the question of whether $\mathscr{{J}} \le I$. The groundbreaking work of Q. Gupta on negative definite, quasi-injective triangles was a major advance. Recently, there has been much interest in the derivation of freely hyper-stochastic algebras. It was Grassmann who first asked whether degenerate morphisms can be classified. In \cite{cite:robey2021parallel}, the main result was the derivation of sub-analytically degenerate classes. Unfortunately, we cannot assume that $\mathfrak{{\ell}} ( \mathfrak{{z}}' ) \ne \| {\varepsilon_{\xi}} \|$.
+        
+        \begin{tikzfigure}[Look, my method is better.]
+            \includegraphics[width=0.5\linewidth]{example-image}
+        \end{tikzfigure}
+>>>>>>> 0538817df8794da920316550a26f42cb787c105b
     }
     \block{Application}{
     \begin{wrapfigure}{r}{6cm}
