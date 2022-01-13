@@ -11,77 +11,9 @@ source("dataGenerator.R")
 # creating dataframe / seed / nCores
 dat <- dataGenerator()
 nCores <- detectCores()
+seed <- 42
 
-# function for mice
-miceImp <- function(x, m){
-  seed <- 42
-  imp <- mice(data = x, m = m, 
-              maxit = 5, seed = seed, printFlag = FALSE)
-  return(imp)
-}
-
-# function for parlmice
-parlmiceImp <- function(data, m, cluster.seed, n.core, n.imp.core, cl.type) {
-  imp <- parlmice(data = data, m = m, cluster.seed = cluster.seed,
-                  n.core = n.core, n.imp.core = n.imp.core, cl.type = cl.type,
-                  maxit = 5)
-  return(imp)
-}
-
-
-# function for foreach
-feImp <- function(x, m){
-  seed <- 42
-  nCores <- detectCores()
-  cl <- makeCluster(nCores)
-  clusterSetRNGStream(cl, seed)
-  registerDoParallel(cl)
-  imp <- foreach(i=1:m, .combine=ibind) %dopar% {
-    library(mice)
-    mice(data = x, m = 1, maxit = 5, 
-         seed = seed, printFlag = FALSE)
-  }
-  stopCluster(cl)
-  return(imp)
-}
-
-# function for parLapply
-parLImp <- function(x, m){
-  seed <- 42
-  nCores <- detectCores()
-  cl <- makeCluster(nCores)
-  clusterSetRNGStream(cl, seed)
-  clusterExport(cl=cl, varlist=c("x", "m", "seed", "nCores"),
-                envir=environment())
-  clusterEvalQ(cl, library(mice))
-  
-  imps <- parLapply(cl, X = 1:nCores, function(none){
-    mice(data = x, m = (m/nCores), maxit = 5, 
-         seed = seed, printFlag = FALSE)
-  })
-  stopCluster(cl)
-  imp <- imps[[1]]
-  for (i in 2:length(imps)){
-    imp <- ibind(imp, imps[[i]])
-  }
-  return(imp)
-}
-
-# function for furrr
-furrrImp <- function(x, m){
-  seed <- 42
-  nCores <- detectCores()
-  plan(multisession, workers = nCores)
-  imps <- future_map(rep(1, m), ~mice(data = x, m = 1, 
-                                      maxit = 5, 
-                                      seed = seed,
-                                      printFlag = FALSE))
-  imp <- imps[[1]]
-  for(i in 2:length(imps)){
-    imp <- ibind(imp, imps[[i]])
-  }
-  return(imp)
-}
+source("parallel_functions.R")
 
 imputations <- c(detectCores(), seq(16, 128, 16))
 
@@ -99,28 +31,43 @@ for (i in imputations){
   
   # mice 
   miceTimes <- c(miceTimes,
-                 system.time(miceImp(x = dat, m = i)))
+                 system.time(mice(data = dat, m = i, 
+                                  seed = seed,
+                                  printFlag = FALSE,
+                                  maxit = 5)))
   
   # parlmice
   parlmiceTimes <- c(parlmiceTimes,
-                     system.time(parlmiceImp(data = dat,
-                                             m = i,
-                                             cluster.seed = 42,
-                                             n.core = detectCores(),
-                                             n.imp.core = (i/detectCores()),
-                                             cl.type = "PSOCK")))
+                     system.time(parlmice_wrap(data = dat,
+                                               m = i,
+                                               cluster.seed = seed,
+                                               n.core = nCores,
+                                               n.imp.core = i/nCores,
+                                               cl.type = "PSOCK")))
   
   # foreach
   foreachTimes <- c(foreachTimes,
-                    system.time(feImp(x = dat, m = i)))
+                    system.time(foreach_wrap_alt(data = dat,
+                                                 num_imp = i,
+                                                 seed = seed,
+                                                 num_cores = nCores,
+                                                 backend = "PSOCK")))
   
   # parLapply
   parLapplyTimes <- c(parLapplyTimes,
-                      system.time(parLImp(x = dat, m = i)))
+                      system.time(parLapply_wrap(data = dat, 
+                                                 num_imp = i,
+                                                 seed = seed,
+                                                 num_cores = nCores,
+                                                 backend = "PSOCK")))
   
   # furrr
   furrrTimes <- c(furrrTimes,
-                  system.time(furrrImp(x = dat, m = i)))
+                  system.time(furrr_wrap(data = dat, 
+                                         num_imp = i,
+                                         seed = seed,
+                                         num_cores = nCores,
+                                         backend = "PSOCK")))
   
   
   print(paste0("Finished ", i, " imputations."))
@@ -181,3 +128,4 @@ speedupPlot <- ggplot(data = impSpeedup, aes(x = M, y = Speedup, color = Method)
 
 # plot both next to each other
 ggarrange(runtimePlot, speedupPlot, ncol = 2, nrow = 1)
+
