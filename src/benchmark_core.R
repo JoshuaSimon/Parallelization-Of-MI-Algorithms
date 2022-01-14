@@ -27,272 +27,143 @@ source("src/dataGenerator.R")
 
 # Runs different parallel MI algorithms and measures the run time.
 # The run time is averaged over several benchmark runs.
-benmark_imputation <- function(data, num_imp, cores, runs = 5, os_test = FALSE) {
-    serial_time <- numeric(length(cores))
-    foreach_time <- numeric(length(cores))
-    parlmice_time <- numeric(length(cores))
-    parlapply_time <- numeric(length(cores))
-    foreach_time_fork <- numeric(length(cores))
-    parlmice_time_fork <- numeric(length(cores))
-    parlapply_time_fork <- numeric(length(cores))
-    micemd_time <- numeric(length(cores))
-    furrr_time <- numeric(length(cores))
-
-    run_serial_time <- numeric(length(runs))
-    run_foreach_time <- numeric(length(runs))
-    run_parlmice_time <- numeric(length(runs))
-    run_parlapply_time <- numeric(length(runs))
-    run_foreach_time_fork <- numeric(length(runs))
-    run_parlmice_time_fork <- numeric(length(runs))
-    run_parlapply_time_fork <- numeric(length(runs))
-    run_micemd_time <- numeric(length(runs))
-    run_furrr_time <- numeric(length(runs))
-
+benmark_imputation <- function(data, num_imp, cores, runs = 5,
+  timer_method = "simple", os_test = FALSE) {
+    seed <- 42
     print(paste0(
         "Starting ", runs, " benchmark runs for M = ", num_imp,
         " multiple imputations.")
     )
-    seed <- 42
 
-    # Serial runs.
-    for (run in 1:runs) {
-        run_serial_time[run] <- mice_timer(
-            fun = mice_wrap, fun_name = "mice",
-            data = data, num_imp = num_imp,
-            seed = seed, num_cores = num_cores,
-            backend = NULL, exe_type = "serial", print_flag = TRUE)
+    # Set up lists/vectors with functions and individual parameters for
+    # benchmark executions.
+    fun_calls <- list(mice_wrap, foreach_wrap, parlmice_wrap, parLapply_wrap, micemd_wrap, furrr_wrap)
+    fun_names <- c("serial", "foreach", "parlmice", "parLapply", "mice.par", "furrr")
+    exe_types <- c("serial", "parallel", "parallel", "parallel", "parallel", "parallel")
+    backends <- list("", "PSOCK", "PSOCK", "PSOCK", "", "")
+
+    # Perform parallel backend benchmark. This is only possible on
+    # Linux or MacOS. Therefore the list of functions is extendend
+    # by the FORK calls.
+    if (os_test) {
+        fun_calls <- c(fun_calls, foreach_wrap, parlmice_wrap, parLapply_wrap)
+        fun_names <- c(fun_names, "foreach_fork", "parlmice_fork", "parLapply_fork")
+        exe_types <- c(exe_types, "parallel", "parallel", "parallel")
+        backends <- c(backends, "FORK", "FORK", "FORK")
     }
 
-    serial_time <- rep(mean(run_serial_time), length(cores))
+    # Setup empty data.frame to save the benchmark result data.
+    runtime_data <- data.frame(fun_name = character(),
+                                backend = character(),
+                                run = integer(),
+                                cores = integer(),
+                                imputations = integer(),
+                                user_time = double(),
+                                system_time = double(),
+                                elapsed_time = double(),
+                                speed_up = double(),
+                                parallelism = double(),
+                                stringsAsFactors = FALSE)
 
-    # Parallel runs.
-    for (i in 1:length(cores)) {
-        num_cores <- cores[i]
+    # Iterate over benchmark runs and core combinations
+    # and perform the mice imputations.
+    for (run in 1:runs) {
         cat("\n")
-        print(paste0(
-            "Running M = ", num_imp,
-            " multiple imputations on ", num_cores, " core(s).")
-        )
+        print(paste0("-------- Run ", run, " --------"))
+        for (i in 1:length(cores)) {
+            num_cores <- cores[i]
+            cat("\n")
+            print(paste0(
+                "Running M = ", num_imp,
+                " multiple imputations on ", num_cores, " core(s).")
+            )
 
-        for (run in 1:runs) {
-            # Perform parallel backend benchmark. This is only possible on
-            # Linux or MacOS.
-            if (os_test) {
-                # Parallel run with foreach.
-                run_foreach_time_fork[run] <- mice_timer(
-                    #fun = foreach_wrap, fun_name = "foreach",
-                    fun = foreach_wrap, fun_name = "foreach",
+            # Measure time for every imputation method.
+            for (i in 1:length(fun_calls)) {
+                time <- mice_timer(
+                    fun = fun_calls[[i]], fun_name = fun_names[i],
+                    method = timer_method, print_flag = TRUE,
                     data = data, num_imp = num_imp,
                     seed = seed, num_cores = num_cores,
-                    backend = "FORK", exe_type = "parallel", print_flag = TRUE)
-
-                # Parallel run with built-in mice function.
-                run_parlmice_time_fork[run] <- mice_timer(
-                    fun = parlmice_wrap, fun_name = "parlmice",
-                    data = data, num_imp = num_imp,
-                    seed = seed, num_cores = num_cores,
-                    backend = "FORK", exe_type = "parallel", print_flag = TRUE,
+                    backend = backends[[i]], exe_type = exe_types[i],
                     n.imp.core = ceiling(num_imp / num_cores))
 
-                # Parallel run with parlapply function.
-                run_parlapply_time_fork[run] <- mice_timer(
-                    fun = parLapply_wrap, fun_name = "parLapply",
-                    data = data, num_imp = num_imp,
-                    seed = seed, num_cores = num_cores,
-                    backend = "FORK", exe_type = "parallel", print_flag = TRUE)
+                # Add test results as a new row to the data.frame.
+                if (timer_method == "simple") {
+                    new_row <- c(fun_names[i], backends[[i]],
+                        run, num_cores, num_imp, NA, NA, time, NA, NA)
+                } else if (timer_method == "verbose") {
+                    new_row <- c(fun_names[i], backends[[i]],
+                        run, num_cores, num_imp,
+                        time[[1]], time[[2]], time[[3]], NA, NA)
+                }
+                runtime_data[nrow(runtime_data) + 1, ] <- new_row
             }
-
-            # Parallel run with foreach.
-            run_foreach_time[run] <- mice_timer(
-                #fun = foreach_wrap, fun_name = "foreach",
-                fun = foreach_wrap, fun_name = "foreach",
-                data = data, num_imp = num_imp,
-                seed = seed, num_cores = num_cores,
-                backend = "PSOCK", exe_type = "parallel", print_flag = TRUE)
-
-            # Parallel run with built-in mice function.
-            run_parlmice_time[run] <- mice_timer(
-                fun = parlmice_wrap, fun_name = "parlmice",
-                data = data, num_imp = num_imp,
-                seed = seed, num_cores = num_cores,
-                backend = "PSOCK", exe_type = "parallel", print_flag = TRUE,
-                n.imp.core = ceiling(num_imp / num_cores))
-
-            # Parallel run with parlapply.
-            run_parlapply_time[run] <- mice_timer(
-                fun = parLapply_wrap, fun_name = "parLapply",
-                data = data, num_imp = num_imp,
-                seed = seed, num_cores = num_cores,
-                backend = "PSOCK", exe_type = "parallel", print_flag = TRUE)
-
-            # Parallel run with parallel mice function from micemd package.
-            run_micemd_time[run] <- mice_timer(
-                fun = micemd_wrap, fun_name = "mice.par",
-                data = data, num_imp = num_imp,
-                seed = seed, num_cores = num_cores,
-                backend = NULL, exe_type = "parallel", print_flag = TRUE)
-
-            # Parallel run with furrr.
-            run_furrr_time[run] <- mice_timer(
-                fun = furrr_wrap, fun_name = "furrr",
-                data = data, num_imp = num_imp,
-                seed = seed, num_cores = num_cores,
-                backend = NULL, exe_type = "parallel", print_flag = TRUE)
-        }
-
-        # Calculate average run time per core.
-        foreach_time[i] <- mean(run_foreach_time)
-        parlmice_time[i] <- mean(run_parlmice_time)
-        parlapply_time[i] <- mean(run_parlapply_time)
-        micemd_time[i] <- mean(run_micemd_time)
-        furrr_time[i] <- mean(run_furrr_time)
-
-        if (os_test) {
-            foreach_time_fork[i] <- mean(run_foreach_time_fork)
-            parlmice_time_fork[i] <- mean(run_parlmice_time_fork)
-            parlapply_time_fork[i] <- mean(run_parlapply_time_fork)
         }
     }
 
-    # Assemble data frame with average results and calculate speed ups
-    # as well as the estimated parallelism.
-    runtime_data <- data.frame(
-        cores, serial_time,
-        foreach_time,
-        foreach_time_fork,
-        parlmice_time,
-        parlmice_time_fork,
-        parlapply_time,
-        parlapply_time_fork,
-        micemd_time,
-        furrr_time,
-        serial_time / foreach_time,
-        serial_time / foreach_time_fork,
-        serial_time / parlmice_time,
-        serial_time / parlmice_time_fork,
-        serial_time / parlapply_time,
-        serial_time / parlapply_time_fork,
-        serial_time / micemd_time,
-        serial_time / furrr_time
-    )
+    # Cast columns in dataframe to the correct data type.
+    # Because of adding new rows with c(), everything is
+    # of tyoe character.
+    runtime_data$run <- as.integer(runtime_data$run)
+    runtime_data$cores <- as.integer(runtime_data$cores)
+    runtime_data$imputations <- as.integer()(runtime_data$imputations)
+    runtime_data$user_time <- as.double(runtime_data$user_time)
+    runtime_data$system_time <- as.double(runtime_data$system_time)
+    runtime_data$elapsed_time <- as.double(runtime_data$elapsed_time)
+    runtime_data$speed_up <- as.double(runtime_data$speed_up)
+    runtime_data$parallelism <- as.double(runtime_data$parallelism)
 
-    colnames(runtime_data) <- c(
-        "cores", "serial_time",
-        "foreach_time",
-        "foreach_time_fork",
-        "parlmice_time",
-        "parlmice_time_fork",
-        "parlapply_time",
-        "parlapply_time_fork",
-        "micemd_time",
-        "furrr_time",
-        "foreach_speed_up",
-        "foreach_fork_speed_up",
-        "parlmice_speed_up",
-        "parlmice_fork_speed_up",
-        "parlapply_speed_up",
-        "parlapply_fork_speed_up",
-        "micemd_speed_up",
-        "furrr_speed_up"
-    )
-
-    runtime_data$est_par_foreach <- estimate_parallelism(
-        runtime_data$foreach_speed_up,
-        runtime_data$cores)
-    runtime_data$est_par_foreach_fork <- estimate_parallelism(
-        runtime_data$foreach_fork_speed_up,
-        runtime_data$cores)
-    runtime_data$est_par_parlmice <- estimate_parallelism(
-        runtime_data$parlmice_speed_up,
-        runtime_data$cores)
-    runtime_data$est_par_parlmice_fork <- estimate_parallelism(
-        runtime_data$parlmice_fork_speed_up,
-        runtime_data$cores)
-    runtime_data$est_par_parlapply <- estimate_parallelism(
-        runtime_data$parlapply_speed_up,
-        runtime_data$cores)
-    runtime_data$est_par_parlapply_fork <- estimate_parallelism(
-        runtime_data$parlapply_fork_speed_up,
-        runtime_data$cores)
-    runtime_data$est_par_micemd <- estimate_parallelism(
-        runtime_data$micemd_speed_up,
-        runtime_data$cores)
-    runtime_data$est_par_furrr <- estimate_parallelism(
-        runtime_data$furrr_speed_up,
-        runtime_data$cores)
+    # Calculate speed up and estimated parallelism.
+    serial_time <- mean(runtime_data$elapsed_time[runtime_data$fun_name == "serial"])
+    runtime_data$speed_up[runtime_data$fun_name != "serial"] <- serial_time /
+        runtime_data$elapsed_time[runtime_data$fun_name != "serial"]
+    runtime_data$parallelism[runtime_data$fun_name != "serial"] <- estimate_parallelism(
+        runtime_data$speed_up[runtime_data$fun_name != "serial"],
+        runtime_data$cores[runtime_data$fun_name != "serial"])
 
     return(runtime_data)
 }
+#result <- benmark_imputation(data, 128, cores, runs = 1, timer_method = "simple", os_test = TRUE)
+#result <- benmark_imputation(data, 16, cores, runs = 1, timer_method = "verbose", os_test = TRUE)
 
 
-benmark_plot <- function(runtime_data, cores, value = "time", os_test = FALSE) {
-    if (value == "time") {
-        plot <- ggplot(data = runtime_data) +
-            geom_point(aes(cores, foreach_time, color = "foreach")) +
-            geom_point(aes(cores, parlmice_time, color = "parlmice")) +
-            geom_point(aes(cores, parlapply_time, color = "parLapply")) +
-            geom_point(aes(cores, micemd_time, color = "mice.par")) +
-            geom_point(aes(cores, furrr_time, color = "furrr")) +
-            geom_point(aes(cores, serial_time, color = "serial")) +
-            geom_line(aes(cores, foreach_time, color = "foreach")) +
-            geom_line(aes(cores, parlmice_time, color = "parlmice")) +
-            geom_line(aes(cores, parlapply_time, color = "parLapply")) +
-            geom_line(aes(cores, micemd_time, color = "mice.par")) +
-            geom_line(aes(cores, furrr_time, color = "furrr")) +
-            geom_line(aes(cores, serial_time, color = "serial"))+
-          scmr1
+# Creates different plots of the average of the benchmark
+# results. The plots differ between runtime and speed up.
+benmark_plot <- function(runtime_data, cores, test_mode = "runtime", os_test = FALSE) {
+    # Aggregate data from muliple benchmark runs.
+    runtime_data_group <- runtime_data %>%
+        group_by(fun_name, cores) %>%
+        summarize(avg_elapsed_time = mean(elapsed_time),
+                avg_speed_up = mean(speed_up))
 
-        if (os_test) {
-            plot <- plot +
-                geom_point(aes(cores, foreach_time_fork, color = "foreach_fork")) +
-                geom_point(aes(cores, parlmice_time_fork, color = "parlmice_fork")) +
-                geom_point(aes(cores, parlapply_time_fork, color = "parLapply_fork")) +
-                geom_line(aes(cores, foreach_time_fork, color = "foreach_fork")) +
-                geom_line(aes(cores, parlmice_time_fork, color = "parlmice_fork")) +
-                geom_line(aes(cores, parlapply_time_fork, color = "parLapply_fork"))+
-            scmr2
-        }
+    print(runtime_data_group)
 
-        plot <- plot +
-            ggtitle("Runtime of Multiple Imputations") +
-            scale_x_continuous(breaks = cores) +
-            xlab("Number of CPU cores") + ylab("Runtime in seconds")
-        return(plot)
-
-    } else if (value == "speed_up") {
-        plot <- ggplot(data = runtime_data) +
-            geom_point(aes(cores, foreach_speed_up, color = "foreach")) +
-            geom_point(aes(cores, parlmice_speed_up, color = "parlmice")) +
-            geom_point(aes(cores, parlapply_speed_up, color = "parLapply")) +
-            geom_point(aes(cores, micemd_speed_up, color = "mice.par")) +
-            geom_point(aes(cores, furrr_speed_up, color = "furrr")) +
-            geom_line(aes(cores, foreach_speed_up, color = "foreach")) +
-            geom_line(aes(cores, parlmice_speed_up, color = "parlmice")) +
-            geom_line(aes(cores, parlapply_speed_up, color = "parLapply")) +
-            geom_line(aes(cores, micemd_speed_up, color = "mice.par")) +
-            geom_line(aes(cores, furrr_speed_up, color = "furrr"))+
-          scms1
-
-        if (os_test) {
-            plot <- plot +
-                geom_point(aes(cores, foreach_fork_speed_up, color = "foreach_fork")) +
-                geom_point(aes(cores, parlmice_fork_speed_up, color = "parlmice_fork")) +
-                geom_point(aes(cores, parlapply_fork_speed_up, color = "parLapply_fork")) +
-                geom_line(aes(cores, foreach_fork_speed_up, color = "foreach_fork")) +
-                geom_line(aes(cores, parlmice_fork_speed_up, color = "parlmice_fork")) +
-                geom_line(aes(cores, parlapply_fork_speed_up, color = "parLapply_fork"))+
-            scms2
-        }
-
-        plot <- plot +
-            ggtitle("Speed Up of Multiple Imputations Running in Parallel") +
-            scale_x_continuous(breaks = cores) +
-            xlab("Number of CPU cores") + ylab("Speed Up")
-        return(plot)
+    if (test_mode == "runtime") {
+        plot <- ggplot(data = runtime_data_group,
+                        aes(x = cores, y = avg_elapsed_time, color = fun_name))
+        title <- "Runtime of Multiple Imputations"
+        label <- "Runtime in seconds"
+    } else if (test_mode == "speed_up") {
+        plot <- ggplot(data = runtime_data_group %>%
+                        filter(fun_name != "serial"),
+                        aes(x = cores, y = avg_speed_up, color = fun_name))
+        title <- "Speed Up of Multiple Imputations Running in Parallel"
+        label <- "Speed Up"
     } else {
-       stop("This value is not implementated.")
+       stop("This kind of plot is not implementated.")
     }
+
+    plot <- plot +  geom_line() + geom_point() +
+        custom_color_map(test_mode = test_mode, os_test = os_test) +
+        ggtitle(title) +
+        scale_x_continuous(breaks = cores) +
+        xlab("Number of CPU cores") + ylab(label)
+
+    return(plot)
 }
+#benmark_plot(result, cores, test_mode = "runtime", os_test = TRUE)
+#benmark_plot(result, cores, test_mode = "speed_up", os_test = TRUE)
 
 
 main <- function() {
@@ -311,12 +182,14 @@ main <- function() {
         runtime_data <- benmark_imputation(
             data = data, num_imp = 128,
             cores = cores, runs = 5,
+            timer_method = "simple",
             os_test = os_test)
     } else if (os_name %in% c("Darwin", "Linux")) {
         os_test <- TRUE
         runtime_data <- benmark_imputation(
-            data = data, num_imp = 128,
-            cores = cores, runs = 1,
+            data = data, num_imp = 16,
+            cores = cores, runs = 2,
+            timer_method = "verbose",
             os_test = os_test)
     } else {
         stop("Your OS is not supported by this benchmark.")
@@ -328,9 +201,9 @@ main <- function() {
 
     # Plot the results.
     plot_runtime <- benmark_plot(runtime_data, cores,
-        "time", os_test = os_test)
+        test_mode = "runtime", os_test = os_test)
     plot_speed_up <- benmark_plot(runtime_data, cores,
-        "speed_up", os_test = os_test)
+        test_mode = "speed_up", os_test = os_test)
 
     plot_together <- ggarrange(
         plot_runtime,
