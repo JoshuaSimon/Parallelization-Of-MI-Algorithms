@@ -55,3 +55,40 @@ mice_timer <- function(fun, fun_name, data, num_imp, seed, num_cores, backend, e
 
     return(as.numeric(time_taken))
 }
+
+#Colour Manual for plots
+colourvec <- c("cyan2", "blue3", "darkorchid3", "deeppink2",
+               "sienna2", "red2", "yellow1", "green1", "springgreen4")
+colourtable <- cbind(colourvec, c("foreach", "parlmice", "parLapply", "mice.par",
+                                  "furrr", "serial", "foreach_fork", "parlmice_fork", 
+                                  "parLapply_fork"))
+#for runtime os_test=FALSE
+scmr1 <- scale_colour_manual("", 
+                    breaks = c("foreach", "parlmice", "parLapply", "mice.par", "furrr", "serial"),
+                    values = c("foreach"=colourvec[1], "parlmice"=colourvec[2], 
+                               "parLapply"=colourvec[3], "mice.par"=colourvec[4],
+                               "furrr"=colourvec[5], "serial"=colourvec[6]))
+#for runtime os_test=TRUE
+scmr2 <- scale_colour_manual("", 
+                    breaks = c("foreach", "parlmice", "parLapply", "mice.par", "furrr",         
+                               "serial", "foreach_fork", "parlmice_fork", "parLapply_fork"),
+                    values = c("foreach"=colourvec[1], "parlmice"=colourvec[2], 
+                               "parLapply"=colourvec[3], "mice.par"=colourvec[4],
+                               "furrr"=colourvec[5], "serial"=colourvec[6],
+                               "foreach_fork"=colourvec[7], "parlmice_fork"=colourvec[8],
+                               "parLapply_fork"=colourvec[9]))
+#for speedup os_test=FALSE
+scms1 <- scale_colour_manual("", 
+                    breaks = c("foreach", "parlmice", "parLapply", "mice.par", "furrr"),
+                    values = c("foreach"=colourvec[1], "parlmice"=colourvec[2], 
+                               "parLapply"=colourvec[3], "mice.par"=colourvec[4],
+                               "furrr"=colourvec[5]))
+#for speedup os_test=TRUE
+scms2 <- scale_colour_manual("", 
+                    breaks = c("foreach", "parlmice", "parLapply", "mice.par", "furrr"
+                               , "foreach_fork", "parlmice_fork", "parLapply_fork"),
+                    values = c("foreach"=colourvec[1], "parlmice"=colourvec[2], 
+                               "parLapply"=colourvec[3], "mice.par"=colourvec[4],
+                               "furrr"=colourvec[5],
+                               "foreach_fork"=colourvec[7], "parlmice_fork"=colourvec[8],
+                               "parLapply_fork"=colourvec[9]))

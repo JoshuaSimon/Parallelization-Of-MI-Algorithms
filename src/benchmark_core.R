@@ -239,7 +239,8 @@ benmark_plot <- function(runtime_data, cores, value = "time", os_test = FALSE) {
             geom_line(aes(cores, parlapply_time, color = "parLapply")) +
             geom_line(aes(cores, micemd_time, color = "mice.par")) +
             geom_line(aes(cores, furrr_time, color = "furrr")) +
-            geom_line(aes(cores, serial_time, color = "serial"))
+            geom_line(aes(cores, serial_time, color = "serial"))+
+          scmr1
 
         if (os_test) {
             plot <- plot +
@@ -248,7 +249,8 @@ benmark_plot <- function(runtime_data, cores, value = "time", os_test = FALSE) {
                 geom_point(aes(cores, parlapply_time_fork, color = "parLapply_fork")) +
                 geom_line(aes(cores, foreach_time_fork, color = "foreach_fork")) +
                 geom_line(aes(cores, parlmice_time_fork, color = "parlmice_fork")) +
-                geom_line(aes(cores, parlapply_time_fork, color = "parLapply_fork"))
+                geom_line(aes(cores, parlapply_time_fork, color = "parLapply_fork"))+
+            scmr2
         }
 
         plot <- plot +
@@ -268,7 +270,8 @@ benmark_plot <- function(runtime_data, cores, value = "time", os_test = FALSE) {
             geom_line(aes(cores, parlmice_speed_up, color = "parlmice")) +
             geom_line(aes(cores, parlapply_speed_up, color = "parLapply")) +
             geom_line(aes(cores, micemd_speed_up, color = "mice.par")) +
-            geom_line(aes(cores, furrr_speed_up, color = "furrr"))
+            geom_line(aes(cores, furrr_speed_up, color = "furrr"))+
+          scms1
 
         if (os_test) {
             plot <- plot +
@@ -277,7 +280,8 @@ benmark_plot <- function(runtime_data, cores, value = "time", os_test = FALSE) {
                 geom_point(aes(cores, parlapply_fork_speed_up, color = "parLapply_fork")) +
                 geom_line(aes(cores, foreach_fork_speed_up, color = "foreach_fork")) +
                 geom_line(aes(cores, parlmice_fork_speed_up, color = "parlmice_fork")) +
-                geom_line(aes(cores, parlapply_fork_speed_up, color = "parLapply_fork"))
+                geom_line(aes(cores, parlapply_fork_speed_up, color = "parLapply_fork"))+
+            scms2
         }
 
         plot <- plot +
