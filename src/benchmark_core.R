@@ -107,7 +107,7 @@ benmark_imputation <- function(data, num_imp, cores, runs = 5,
     # of tyoe character.
     runtime_data$run <- as.integer(runtime_data$run)
     runtime_data$cores <- as.integer(runtime_data$cores)
-    runtime_data$imputations <- as.integer()(runtime_data$imputations)
+    runtime_data$imputations <- as.integer(runtime_data$imputations)
     runtime_data$user_time <- as.double(runtime_data$user_time)
     runtime_data$system_time <- as.double(runtime_data$system_time)
     runtime_data$elapsed_time <- as.double(runtime_data$elapsed_time)
