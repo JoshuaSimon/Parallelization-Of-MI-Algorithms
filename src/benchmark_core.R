@@ -128,6 +128,7 @@ benmark_imputation <- function(data, num_imp, cores, runs = 5,
 #result <- benmark_imputation(data, 16, cores, runs = 1, timer_method = "verbose", os_test = TRUE)
 
 
+# TODO: Add plot function for verbose data mode.
 # Creates different plots of the average of the benchmark
 # results. The plots differ between runtime and speed up.
 benmark_plot <- function(runtime_data, cores, test_mode = "runtime", os_test = FALSE) {
