@@ -108,7 +108,7 @@ impTimes <- data.frame(
   Runtime = c(runtimeMice, runtimeParlmice, runtimeMicePar,
               runtimeForeach, runtimeParlapply, runtimeFurrr),
   M = c(rep(imputations, 6)),
-  Method = c(rep("mice", 9), rep("parlmice", 9), rep("mice.par", 9),
+  Method = c(rep("serial", 9), rep("parlmice", 9), rep("mice.par", 9),
              rep("foreach", 9), rep("parLapply", 9),
              rep("furrr", 9))
 )
@@ -129,21 +129,20 @@ impSpeedup <- data.frame(
 # saving the dataframes
 # save(impTimes, impSpeedup, file = "miTimeSpeedup.RData")
 
+source("utils.R")
+
 # plot m vs runtime
 runtimePlot <- ggplot(data = impTimes, aes(x = M, y = Runtime, color=Method)) + 
   geom_line() + 
   geom_point() +
   scale_x_continuous(breaks = c(detectCores(), seq(16, 128, 16))) +
-  scale_color_manual(breaks = c("mice", "parlmice", "mice.par", "foreach", "parLapply", "furrr"),
-                     values = c("red2", "blue3", "deeppink2", "cyan2", "darkorchid3", "sienna2"))
+  custom_color_map(test_mode = "runtime", os_test = FALSE)
 
 speedupPlot <- ggplot(data = impSpeedup, aes(x = M, y = Speedup, color=Method)) + 
   geom_line() + 
   geom_point() +
   scale_x_continuous(breaks = c(detectCores(), seq(16, 128, 16))) +
-  scale_color_manual(breaks = c("parlmice", "mice.par", "foreach", "parLapply", "furrr"),
-                     values = c("blue3", "deeppink2", "cyan2", "darkorchid3", "sienna2"))
+  custom_color_map(test_mode = "speed_up", os_test = FALSE)
 
 # plot both next to each other
 ggarrange(runtimePlot, speedupPlot, ncol = 2, nrow = 1)
-
