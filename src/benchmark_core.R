@@ -90,34 +90,28 @@ benmark_imputation <- function(data, num_imp, cores, runs = 5,
 
                 # Add test results as a new row to the data.frame.
                 if (timer_method == "simple") {
-                    new_row <- c(fun_names[i], backends[[i]],
-                        run, num_cores, num_imp, NA, NA, time, NA, NA)
+                    new_row <- data.frame(
+                        fun_name = fun_names[i], backend = backends[[i]],
+                        run = run, cores = num_cores, imputations = num_imp,
+                        user_time = NA, system_time = NA,
+                        elapsed_time = time,
+                        speed_up = NA, parallelism = NA)
                 } else if (timer_method == "verbose") {
-                    new_row <- c(fun_names[i], backends[[i]],
-                        run, num_cores, num_imp,
-                        time[[1]], time[[2]], time[[3]], NA, NA)
+                    new_row <- data.frame(
+                        fun_name = fun_names[i], backend = backends[[i]],
+                        run = run, cores = num_cores, imputations = num_imp,
+                        user_time = time[[1]], system_time = time[[2]],
+                        elapsed_time = time[[3]],
+                        speed_up =  NA, parallelism = NA)
                 }
-                runtime_data[nrow(runtime_data) + 1, ] <- new_row
+                runtime_data <- rbind(runtime_data, new_row)
             }
         }
     }
 
-    # Cast columns in dataframe to the correct data type.
-    # Because of adding new rows with c(), everything is
-    # of tyoe character.
-    runtime_data$run <- as.integer(runtime_data$run)
-    runtime_data$cores <- as.integer(runtime_data$cores)
-    runtime_data$imputations <- as.integer(runtime_data$imputations)
-    runtime_data$user_time <- as.double(runtime_data$user_time)
-    runtime_data$system_time <- as.double(runtime_data$system_time)
-    runtime_data$elapsed_time <- as.double(runtime_data$elapsed_time)
-    runtime_data$speed_up <- as.double(runtime_data$speed_up)
-    runtime_data$parallelism <- as.double(runtime_data$parallelism)
-
     # Calculate speed up and estimated parallelism.
     serial_time <- mean(runtime_data$elapsed_time[runtime_data$fun_name == "serial"])
-    runtime_data$speed_up[runtime_data$fun_name != "serial"] <- serial_time /
-        runtime_data$elapsed_time[runtime_data$fun_name != "serial"]
+    runtime_data$speed_up <- serial_time / runtime_data$elapsed_time
     runtime_data$parallelism[runtime_data$fun_name != "serial"] <- estimate_parallelism(
         runtime_data$speed_up[runtime_data$fun_name != "serial"],
         runtime_data$cores[runtime_data$fun_name != "serial"])
@@ -132,6 +126,10 @@ benmark_imputation <- function(data, num_imp, cores, runs = 5,
 # Creates different plots of the average of the benchmark
 # results. The plots differ between runtime and speed up.
 benmark_plot <- function(runtime_data, cores, test_mode = "runtime", os_test = FALSE) {
+    # Average all serial data.
+    serial_time <- mean(runtime_data$elapsed_time[runtime_data$fun_name == "serial"])
+    runtime_data$elapsed_time[runtime_data$fun_name == "serial"] <- serial_time
+
     # Aggregate data from muliple benchmark runs.
     runtime_data_group <- runtime_data %>%
         group_by(fun_name, cores) %>%
@@ -168,37 +166,37 @@ benmark_plot <- function(runtime_data, cores, test_mode = "runtime", os_test = F
 
 
 main <- function() {
-    # Run the benmark.
-    num_cores <- detectCores()
-    cores <- c(1, power_of_two(log(num_cores) / log(2)))
-
-    data <- dataGenerator(n = 10000)
-
     # Check for the OS type of the machine and choose
     # a suitiable benchmark run. On Linux and MacOS
     # different parallel backends are compared.
     os_name <- Sys.info()[["sysname"]]
     if (os_name == "Windows") {
         os_test <- FALSE
-        runtime_data <- benmark_imputation(
-            data = data, num_imp = 128,
-            cores = cores, runs = 5,
-            timer_method = "simple",
-            os_test = os_test)
     } else if (os_name %in% c("Darwin", "Linux")) {
         os_test <- TRUE
-        runtime_data <- benmark_imputation(
-            data = data, num_imp = 16,
-            cores = cores, runs = 2,
-            timer_method = "verbose",
-            os_test = os_test)
     } else {
         stop("Your OS is not supported by this benchmark.")
     }
 
+    # Set benchmark parameters.
+    data <- dataGenerator(n = 10000)
+    num_cores <- detectCores()
+    cores <- c(1, power_of_two(log(num_cores) / log(2)))
+    test_methods <- c("simple", "verbose")
+    test_method <- test_methods[2]
+    total_imputations <- 16
+    total_bechmark_runs <- 2
+
+    # Run the benmark.
+    runtime_data <- benmark_imputation(
+        data = data, num_imp = total_imputations,
+        cores = cores, runs = total_bechmark_runs,
+        timer_method = test_method,
+        os_test = os_test)
+
     # Save the benchmark and session data as an .RData object.
     filename <- paste0("data/", Sys.Date(), "_benchmark_core_", os_name, ".RData")
-    save(runtime_data, os_name, os_test, cores, file = filename)
+    save(runtime_data, os_name, os_test, cores, test_method, file = filename)
 
     # Plot the results.
     plot_runtime <- benmark_plot(runtime_data, cores,
@@ -221,6 +219,11 @@ main <- function() {
 
     filename <- paste0("img/", Sys.Date(), "_benchmark_core_", os_name, "_both.png")
     ggsave(filename = filename, plot = plot_together, width = 12, height = 5)
+
+    #if (test_method == "verbose") {
+    #    filename <- paste0("img/", Sys.Date(), "_benchmark_core_", os_name, "_cpu_time.png")
+    #    ggsave(filename = filename, plot = plot_together, width = 8, height = 5)
+    #}
 }
 
 
