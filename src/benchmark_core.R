@@ -226,7 +226,7 @@ main <- function() {
     test_methods <- c("simple", "verbose")
     test_method <- test_methods[2]
     total_imputations <- 128
-    total_bechmark_runs <- 1
+    total_bechmark_runs <- 10
 
     # Run the benmark.
     runtime_data <- benmark_imputation(
