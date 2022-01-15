@@ -118,11 +118,8 @@ benmark_imputation <- function(data, num_imp, cores, runs = 5,
 
     return(runtime_data)
 }
-#result <- benmark_imputation(data, 128, cores, runs = 1, timer_method = "simple", os_test = TRUE)
-#result <- benmark_imputation(data, 16, cores, runs = 1, timer_method = "verbose", os_test = TRUE)
 
 
-# TODO: Add plot function for verbose data mode.
 # Creates different plots of the average of the benchmark
 # results. The plots differ between runtime and speed up.
 benmark_plot <- function(runtime_data, cores, test_mode = "runtime", os_test = FALSE) {
@@ -134,9 +131,7 @@ benmark_plot <- function(runtime_data, cores, test_mode = "runtime", os_test = F
     runtime_data_group <- runtime_data %>%
         group_by(fun_name, cores) %>%
         summarize(avg_elapsed_time = mean(elapsed_time),
-                avg_speed_up = mean(speed_up))
-
-    print(runtime_data_group)
+                    avg_speed_up = mean(speed_up))
 
     if (test_mode == "runtime") {
         plot <- ggplot(data = runtime_data_group,
@@ -161,8 +156,54 @@ benmark_plot <- function(runtime_data, cores, test_mode = "runtime", os_test = F
 
     return(plot)
 }
-#benmark_plot(result, cores, test_mode = "runtime", os_test = TRUE)
-#benmark_plot(result, cores, test_mode = "speed_up", os_test = TRUE)
+
+
+# Retunrs a ggplot object containing a bar chart of the different
+# CPU times of the MI methods.
+benchmark_plot_cpu_time <- function(runtime_data, num_cores, os_test = FALSE) {
+    # Aggregate data from muliple benchmark runs.
+    runtime_data_group <- runtime_data %>%
+        group_by(fun_name, cores) %>%
+        summarize(
+            avg_user_time = mean(user_time, na.rm = TRUE),
+            avg_system_time = mean(system_time, na.rm = TRUE),
+            avg_elapsed_time = mean(elapsed_time, na.rm = TRUE),
+            avg_speed_up = mean(speed_up, na.rm = TRUE)
+            )
+
+    # Transform data shpae to match the input shpae of ggplot's
+    # barplots better.
+    bar_data <- runtime_data_group %>%
+        select(fun_name, cores, avg_elapsed_time) %>%
+        mutate(cpu_time = "elapsed")
+
+    new_data <- runtime_data_group %>%
+        select(fun_name, cores, avg_user_time) %>%
+        mutate(cpu_time = "user")
+    colnames(new_data) <- c("fun_name", "cores", "avg_elapsed_time", "cpu_time")
+    bar_data <- rbind(bar_data, new_data)
+
+    new_data <- runtime_data_group %>%
+        select(fun_name, cores, avg_system_time) %>%
+        mutate(cpu_time = "system")
+    colnames(new_data) <- c("fun_name", "cores", "avg_elapsed_time", "cpu_time")
+    bar_data <- rbind(bar_data, new_data)
+
+    # Set up plot object.
+    plot <- ggplot(data = bar_data %>% filter(cores == num_cores),
+                    aes(x = fun_name, y = avg_elapsed_time, fill = cpu_time))
+
+    title <- paste0("CPU time of Multiple Imputation on ", num_cores, " Cores")
+    label <- "CPU time in seconds"
+
+    plot <- plot + geom_bar(stat = "identity", position = position_dodge()) +
+        custom_color_map(test_mode = "runtime", os_test = os_test) +
+        ggtitle(title) +
+        #scale_x_continuous(breaks = cores) +
+        xlab("MI implementation method") + ylab(label)
+
+    return(plot)
+}
 
 
 main <- function() {
@@ -184,8 +225,8 @@ main <- function() {
     cores <- c(1, power_of_two(log(num_cores) / log(2)))
     test_methods <- c("simple", "verbose")
     test_method <- test_methods[2]
-    total_imputations <- 16
-    total_bechmark_runs <- 2
+    total_imputations <- 128
+    total_bechmark_runs <- 1
 
     # Run the benmark.
     runtime_data <- benmark_imputation(
@@ -220,10 +261,11 @@ main <- function() {
     filename <- paste0("img/", Sys.Date(), "_benchmark_core_", os_name, "_both.png")
     ggsave(filename = filename, plot = plot_together, width = 12, height = 5)
 
-    #if (test_method == "verbose") {
-    #    filename <- paste0("img/", Sys.Date(), "_benchmark_core_", os_name, "_cpu_time.png")
-    #    ggsave(filename = filename, plot = plot_together, width = 8, height = 5)
-    #}
+    if (test_method == "verbose") {
+        plot_cpu <- benchmark_plot_cpu_time(runtime_data, num_cores, os_test)
+        filename <- paste0("img/", Sys.Date(), "_benchmark_core_", os_name, "_cpu_time.png")
+        ggsave(filename = filename, plot = plot_cpu, width = 10, height = 5)
+    }
 }
 
 
