@@ -90,55 +90,48 @@ benmark_imputation <- function(data, num_imp, cores, runs = 5,
 
                 # Add test results as a new row to the data.frame.
                 if (timer_method == "simple") {
-                    new_row <- c(fun_names[i], backends[[i]],
-                        run, num_cores, num_imp, NA, NA, time, NA, NA)
+                    new_row <- data.frame(
+                        fun_name = fun_names[i], backend = backends[[i]],
+                        run = run, cores = num_cores, imputations = num_imp,
+                        user_time = NA, system_time = NA,
+                        elapsed_time = time,
+                        speed_up = NA, parallelism = NA)
                 } else if (timer_method == "verbose") {
-                    new_row <- c(fun_names[i], backends[[i]],
-                        run, num_cores, num_imp,
-                        time[[1]], time[[2]], time[[3]], NA, NA)
+                    new_row <- data.frame(
+                        fun_name = fun_names[i], backend = backends[[i]],
+                        run = run, cores = num_cores, imputations = num_imp,
+                        user_time = time[[1]], system_time = time[[2]],
+                        elapsed_time = time[[3]],
+                        speed_up =  NA, parallelism = NA)
                 }
-                runtime_data[nrow(runtime_data) + 1, ] <- new_row
+                runtime_data <- rbind(runtime_data, new_row)
             }
         }
     }
 
-    # Cast columns in dataframe to the correct data type.
-    # Because of adding new rows with c(), everything is
-    # of tyoe character.
-    runtime_data$run <- as.integer(runtime_data$run)
-    runtime_data$cores <- as.integer(runtime_data$cores)
-    runtime_data$imputations <- as.integer(runtime_data$imputations)
-    runtime_data$user_time <- as.double(runtime_data$user_time)
-    runtime_data$system_time <- as.double(runtime_data$system_time)
-    runtime_data$elapsed_time <- as.double(runtime_data$elapsed_time)
-    runtime_data$speed_up <- as.double(runtime_data$speed_up)
-    runtime_data$parallelism <- as.double(runtime_data$parallelism)
-
     # Calculate speed up and estimated parallelism.
     serial_time <- mean(runtime_data$elapsed_time[runtime_data$fun_name == "serial"])
-    runtime_data$speed_up[runtime_data$fun_name != "serial"] <- serial_time /
-        runtime_data$elapsed_time[runtime_data$fun_name != "serial"]
+    runtime_data$speed_up <- serial_time / runtime_data$elapsed_time
     runtime_data$parallelism[runtime_data$fun_name != "serial"] <- estimate_parallelism(
         runtime_data$speed_up[runtime_data$fun_name != "serial"],
         runtime_data$cores[runtime_data$fun_name != "serial"])
 
     return(runtime_data)
 }
-#result <- benmark_imputation(data, 128, cores, runs = 1, timer_method = "simple", os_test = TRUE)
-#result <- benmark_imputation(data, 16, cores, runs = 1, timer_method = "verbose", os_test = TRUE)
 
 
-# TODO: Add plot function for verbose data mode.
 # Creates different plots of the average of the benchmark
 # results. The plots differ between runtime and speed up.
 benmark_plot <- function(runtime_data, cores, test_mode = "runtime", os_test = FALSE) {
+    # Average all serial data.
+    serial_time <- mean(runtime_data$elapsed_time[runtime_data$fun_name == "serial"])
+    runtime_data$elapsed_time[runtime_data$fun_name == "serial"] <- serial_time
+
     # Aggregate data from muliple benchmark runs.
     runtime_data_group <- runtime_data %>%
         group_by(fun_name, cores) %>%
         summarize(avg_elapsed_time = mean(elapsed_time),
-                avg_speed_up = mean(speed_up))
-
-    print(runtime_data_group)
+                    avg_speed_up = mean(speed_up))
 
     if (test_mode == "runtime") {
         plot <- ggplot(data = runtime_data_group,
@@ -163,42 +156,88 @@ benmark_plot <- function(runtime_data, cores, test_mode = "runtime", os_test = F
 
     return(plot)
 }
-#benmark_plot(result, cores, test_mode = "runtime", os_test = TRUE)
-#benmark_plot(result, cores, test_mode = "speed_up", os_test = TRUE)
+
+
+# Retunrs a ggplot object containing a bar chart of the different
+# CPU times of the MI methods.
+benchmark_plot_cpu_time <- function(runtime_data, num_cores, os_test = FALSE) {
+    # Aggregate data from muliple benchmark runs.
+    runtime_data_group <- runtime_data %>%
+        group_by(fun_name, cores) %>%
+        summarize(
+            avg_user_time = mean(user_time, na.rm = TRUE),
+            avg_system_time = mean(system_time, na.rm = TRUE),
+            avg_elapsed_time = mean(elapsed_time, na.rm = TRUE),
+            avg_speed_up = mean(speed_up, na.rm = TRUE)
+            )
+
+    # Transform data shpae to match the input shpae of ggplot's
+    # barplots better.
+    bar_data <- runtime_data_group %>%
+        select(fun_name, cores, avg_elapsed_time) %>%
+        mutate(cpu_time = "elapsed")
+
+    new_data <- runtime_data_group %>%
+        select(fun_name, cores, avg_user_time) %>%
+        mutate(cpu_time = "user")
+    colnames(new_data) <- c("fun_name", "cores", "avg_elapsed_time", "cpu_time")
+    bar_data <- rbind(bar_data, new_data)
+
+    new_data <- runtime_data_group %>%
+        select(fun_name, cores, avg_system_time) %>%
+        mutate(cpu_time = "system")
+    colnames(new_data) <- c("fun_name", "cores", "avg_elapsed_time", "cpu_time")
+    bar_data <- rbind(bar_data, new_data)
+
+    # Set up plot object.
+    plot <- ggplot(data = bar_data %>% filter(cores == num_cores),
+                    aes(x = fun_name, y = avg_elapsed_time, fill = cpu_time))
+
+    title <- paste0("CPU time of Multiple Imputation on ", num_cores, " Cores")
+    label <- "CPU time in seconds"
+
+    plot <- plot + geom_bar(stat = "identity", position = position_dodge()) +
+        custom_color_map(test_mode = "runtime", os_test = os_test) +
+        ggtitle(title) +
+        #scale_x_continuous(breaks = cores) +
+        xlab("MI implementation method") + ylab(label)
+
+    return(plot)
+}
 
 
 main <- function() {
-    # Run the benmark.
-    num_cores <- detectCores()
-    cores <- c(1, power_of_two(log(num_cores) / log(2)))
-
-    data <- dataGenerator(n = 10000)
-
     # Check for the OS type of the machine and choose
     # a suitiable benchmark run. On Linux and MacOS
     # different parallel backends are compared.
     os_name <- Sys.info()[["sysname"]]
     if (os_name == "Windows") {
         os_test <- FALSE
-        runtime_data <- benmark_imputation(
-            data = data, num_imp = 128,
-            cores = cores, runs = 5,
-            timer_method = "simple",
-            os_test = os_test)
     } else if (os_name %in% c("Darwin", "Linux")) {
         os_test <- TRUE
-        runtime_data <- benmark_imputation(
-            data = data, num_imp = 16,
-            cores = cores, runs = 2,
-            timer_method = "verbose",
-            os_test = os_test)
     } else {
         stop("Your OS is not supported by this benchmark.")
     }
 
+    # Set benchmark parameters.
+    data <- dataGenerator(n = 10000)
+    num_cores <- detectCores()
+    cores <- c(1, power_of_two(log(num_cores) / log(2)))
+    test_methods <- c("simple", "verbose")
+    test_method <- test_methods[2]
+    total_imputations <- 128
+    total_bechmark_runs <- 1
+
+    # Run the benmark.
+    runtime_data <- benmark_imputation(
+        data = data, num_imp = total_imputations,
+        cores = cores, runs = total_bechmark_runs,
+        timer_method = test_method,
+        os_test = os_test)
+
     # Save the benchmark and session data as an .RData object.
     filename <- paste0("data/", Sys.Date(), "_benchmark_core_", os_name, ".RData")
-    save(runtime_data, os_name, os_test, cores, file = filename)
+    save(runtime_data, os_name, os_test, cores, test_method, file = filename)
 
     # Plot the results.
     plot_runtime <- benmark_plot(runtime_data, cores,
@@ -221,6 +260,12 @@ main <- function() {
 
     filename <- paste0("img/", Sys.Date(), "_benchmark_core_", os_name, "_both.png")
     ggsave(filename = filename, plot = plot_together, width = 12, height = 5)
+
+    if (test_method == "verbose") {
+        plot_cpu <- benchmark_plot_cpu_time(runtime_data, num_cores, os_test)
+        filename <- paste0("img/", Sys.Date(), "_benchmark_core_", os_name, "_cpu_time.png")
+        ggsave(filename = filename, plot = plot_cpu, width = 10, height = 5)
+    }
 }
 
 
