@@ -52,11 +52,13 @@
 \begin{columns}
     \column{0.32}
     \block{What is Parallelization?}{
-         Parallelization is a technique to fasten time-consuming computations. It uses all the cores on a CPU (Central Processing Unit) parallely and splits up the computational work on them. Afterwords, the results are merged. This can reduce the time needed for a task. 
-                 
-         \begin{tikzfigure}[4 CPUs with 4 cores each]
-         	\includegraphics[width=0.3\linewidth]{img/cpu.png}
-         \end{tikzfigure}
+    	\begin{wrapfigure}{l}{7cm}
+    		\includegraphics[width=7cm]{img/cpu.png}
+    	\end{wrapfigure}
+         Parallelization is a technique to fasten time-consuming computations. It uses all the cores on a CPU (Central Processing Unit) parallely and splits up the computational work on them. Afterwords, the results are merged. This can reduce the time needed for a task. \\
+         \\
+         \\
+        
     }
 	\block{Theory}{
 		\textbf{Parallel Computing}\\
@@ -65,7 +67,7 @@
 		\end{wrapfigure}
 		In parallel programming, the multiple cores of a computational system want to be used best to decrease computation time. Gene \textbf{Amdahl} was the first one to desribe the boundaries of that project: Every parallel process also requires additional workload, so called "data management housekeeping". The speed up through parallel processing will tend to 0 at a certain amount of processing units involved, as this \textbf{overhead} workload exceeds the capacity of the computational unit which it is assigned to.\\
 		\textbf{Multiple Imputation}\\
-		Multiple imputation is a method to complete a dataset with missing information. It relies on the estimation of the missing values through different methods. What is common to them is that we use not a single
+		Multiple imputation is a method to complete a dataset with missing information. It relies on the estimation of the missing values through different methods. What is common to them is that we use not a single imputation run, but several. The results of all imputation runs are then merged and lead to realistic uncertainty of the estimators given the missing data. 
 	}
 	\block{Methodology}{
 	\textbf{data generation} We used a simple data generator of normally distributed random variables. The data set created contains 10 variables, of which some depend on each other. The sample size created was n 10000. Expermients were compared to euqal settings with real data, and the results did not change the direction of the results. More complex data favor the mechanism of parallelization.\\
