@@ -52,8 +52,10 @@
 \begin{columns}
     \column{0.32}
     \block{What is Parallelization?}{
-    	\begin{wrapfigure}{l}{7cm}
-    		\includegraphics[width=7cm]{img/cpu.png}
+    	\begin{wrapfigure}{l}{6cm}
+    		\centering
+    	    \includegraphics[width=6cm]{img/cpu.png}
+    	    \caption{4 processors with 4 cores each}
     	\end{wrapfigure}
          Parallelization is a technique to fasten time-consuming computations. It uses all the cores on a CPU (Central Processing Unit) parallely and splits up the computational work on them. Afterwords, the results are merged. This can reduce the time needed for a task. \\
          \\
@@ -63,7 +65,9 @@
 	\block{Theory}{
 		\textbf{Parallel Computing}\\
 		\begin{wrapfigure}{r}{8cm}
+			\centering
 			\includegraphics[width=8cm]{img/600px-AmdahlsLaw.svg}
+			\caption{Amdahls Law}
 		\end{wrapfigure}
 		In parallel programming, the multiple cores of a computational system want to be used best to decrease computation time. Gene \textbf{Amdahl} was the first one to desribe the boundaries of that project: Every parallel process also requires additional workload, so called "data management housekeeping". The speed up through parallel processing will tend to 0 at a certain amount of processing units involved, as this \textbf{overhead} workload exceeds the capacity of the computational unit which it is assigned to.\\
 		\textbf{Multiple Imputation}\\
@@ -85,13 +89,13 @@
         \vspace{1em}
        
        \vspace{1em}
-       \begin{tikzfigure}[Runtime and Speedup from 1 up to 8 cores]
+       \begin{tikzfigure}[Runtime and Speedup from 1 up to 128 Imputation runs]
        	\includegraphics[width=1\linewidth]{img/runtime_nimp_speedup_resized}
        \end{tikzfigure}
        \vspace{1em}
        
       \vspace{1em}
-      \begin{tikzfigure}[Runtime and Speedup from 1 up to 8 cores]
+      \begin{tikzfigure}[Time components for the different implementations on 16 cores]
       	\includegraphics[width=0.7\linewidth]{img/2022-01-15_benchmark_core_Linux_cpu_time}
       \end{tikzfigure}
       \vspace{1em} 
