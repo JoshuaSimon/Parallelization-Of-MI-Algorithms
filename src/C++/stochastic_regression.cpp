@@ -13,6 +13,7 @@
     $ g++ -I eigen-3.4.0 stochastic_regression.cpp -o stochastic_regression.out -std=c++17 (serial)
     $ g++ -I eigen-3.4.0 stochastic_regression.cpp -o stochastic_regression.out -std=c++17 -lpthread (parallel)
     $ clang++ -I eigen-3.4.0 stochastic_regression.cpp -o stochastic_regression.out -std=c++17 (serial)
+    $ clang++ -I eigen-3.4.0 stochastic_regression.cpp -o stochastic_regression.out -std=c++17 -lpthread (parallel)
 
     To run it type
     $ ./stochastic_regression.out
