@@ -52,32 +52,28 @@
 \begin{columns}
     \column{0.32}
     \block{What is Parallelization?}{
-    	\begin{wrapfigure}{l}{6cm}
+    	\begin{wrapfigure}{l}{5cm}
     		\centering
-    	    \includegraphics[width=6cm]{img/cpu.png}
+    	    \includegraphics[width=5cm]{img/cpu.png}
     	    \caption{4 processors with 4 cores each}
     	\end{wrapfigure}
-         Parallelization is a technique to fasten time-consuming computations. It uses all the cores on a CPU (Central Processing Unit) parallely and splits up the computational work on them. Afterwords, the results are merged. This can reduce the time needed for a task. \\
-         \\
-         \\
-        
+         \textcolor{earthyellow}{\textbf{Parallelization}} is a technique to fasten time-consuming computations. It uses several  cores on a \textbf{CPU} parallely and splits up the computational work on them. Afterwords, the results are merged. This can reduce the runtime significantly. Parallelization is nevertheless limited to a certain kind of tasks: The computations to be parallelized must be independent from each other, as information cannot be cross-accessed over the cores while the process is running.\\
+       
     }
 	\block{Theory}{
-		\textbf{Parallel Computing}\\
-		\begin{wrapfigure}{r}{8cm}
+		\begin{wrapfigure}{r}{15cm}
 			\centering
-			\includegraphics[width=8cm]{img/600px-AmdahlsLaw.svg}
+			\includegraphics[width=15cm]{img/600px-AmdahlsLaw.svg}
 			\caption{Amdahls Law}
 		\end{wrapfigure}
-		In parallel programming, the multiple cores of a computational system want to be used best to decrease computation time. Gene \textbf{Amdahl} was the first one to desribe the boundaries of that project: Every parallel process also requires additional workload, so called "data management housekeeping". The speed up through parallel processing will tend to 0 at a certain amount of processing units involved, as this \textbf{overhead} workload exceeds the capacity of the computational unit which it is assigned to.\\
-		\textbf{Multiple Imputation}\\
-		Multiple imputation is a method to complete a dataset with missing information. It relies on the estimation of the missing values through different methods. What is common to them is that we use not a single imputation run, but several. The results of all imputation runs are then merged and lead to realistic uncertainty of the estimators given the missing data. 
+		In \textcolor{earthyellow}{\textbf{parallel programming}}, the multiple cores of a computational system want to be used best to decrease computation time. Gene \textbf{Amdahl} was the first one to desribe the boundaries of that project: Every parallel process also requires additional workload, so called "data management housekeeping". The speed up through parallel processing will tend to 0 at a certain amount of processing units involved, as this \textbf{overhead} workload exceeds the capacity of the computational unit which it is assigned to.\\
+		\textcolor{earthyellow}{\textbf{Multiple imputation}} is a method to complete a dataset with missing information. It relies on the estimation of the missing values through different methods. What is common to them is that we use not a single imputation run, but several. The results of all imputation runs are then merged and lead to realistic uncertainty of the estimators given the missing data. It is prone to be parallelized, as the several imputation runs can be processed independend of each other on different cores and easily merged afterwards. 
 	}
 	\block{Methodology}{
-	\textbf{data generation} We used a simple data generator of normally distributed random variables. The data set created contains 10 variables, of which some depend on each other. The sample size created was n 10000. Expermients were compared to euqal settings with real data, and the results did not change the direction of the results. More complex data favor the mechanism of parallelization.\\
-	\textbf{time measurement} was done with the \textit{system.time} function, which returns 3 values: User CPU-, User System- and Elapsed time. User CPU is the time needed by the current task such as an execution in R. System CPU describes the time needed by the operating system to organize that task such as opening folders or asking for the System time. Elapsed time is the Wall Clock time that passed while the function was running.\\
-	\textbf{mice method} The method of the mice algorithm was set on defaut, pmm.\\
-	\textbf{speed up}The speed\_up value is calculated by the serial time (runtime without parallelization) divided by the runtime of the current parallelization implementation \cite{cite:chapple2016mastering}. Values below one show that the parallelized run took longer than the serial run.\\
+	As the \textcolor{earthyellow}{\textbf{dataset}} we used a simple data generator of normally distributed random variables. The data set created contains 10 variables, of which some depend on each other. The sample size is n=10000. Parallelizationfavors complex data sets, so the amount of variables and their interdependency should not be to small.\\
+	\textcolor{earthyellow}{\textbf{Time measurement}} was done with the \textit{system.time} function, which returns 3 values: User CPU-, User System- and Elapsed time. User CPU is the time needed for the current task such as an execution in R. System CPU describes the time needed by the operating system to organize that task such as opening folders or asking for the System time. Elapsed time is the wall clock time that passed while the function and background processes were running.\\
+	The \textcolor{earthyellow}{\textbf{method}} of the \textcolor{earthyellow}{\textbf{mice}} algorithm was set on defaut, pmm.\\
+	The \textcolor{earthyellow}{\textbf{speed up}} value is calculated by the serial time (runtime without parallelization) divided by the runtime of the current parallelization implementation \cite{cite:chapple2016mastering}. Values below one show that the parallelized run took longer than the serial run.\\
 	}
     \column{0.36}
     \block{Results}{
@@ -104,26 +100,30 @@
     \column{0.32}
     \block{Comparison of Implementations}{
     	
-    	\textbf{foreach::foreach} usability \hspace{-1mm}\small{\score{2.4}{5}} \hspace{1cm} runtime\hspace{-1mm}\small{\score{2.4}{5}}\\
+    	\textbf{foreach::foreach} usability \hspace{-1mm}\big{\score{2.4}{5}} \hspace{1cm} runtime \hspace{-1mm}\big{\score{2.4}{5}}\\
     	\\
     	\textbf{mice::parlmice} usability
-    	\hspace{-1mm}\small{\score{2.4}{5}}\\
+    	\hspace{-1mm}\big{\score{2.4}{5}}\\
     	\\
     	\textbf{micemd::mice.par} usability
-    	\hspace{-1mm}\small{\score{2.4}{5}}\\
+    	\hspace{-1mm}\big{\score{2.4}{5}}\\
     	\\
     	\textbf{parallel::parLapply} usability
-    	\hspace{-1mm}\small{\score{2.4}{5}}\\
+    	\hspace{-1mm} \big{\score{2.4}{5}}\\
     	\\
-    	\textbf{purrr::future\_map} usability
-    	\hspace{-1mm}\small{\score{2.4}{5}}\\ 
+    	\textbf{furrr::future\_map} usability
+    	\hspace{-1mm}\big{\score{2.4}{5}}\\ 
     	\\
+    	\textbf{future.apply::future\_lapply} usability
+    	\hspace{-1mm}\big{\score{2.4}{5}}\\ 
+    	\\
+    	\centering{\textit{PSOCK} vs. \textit{FORK}}
     }
     \block{Application}{
     \begin{wrapfigure}{r}{6cm}
     	\includegraphics[width=5cm]{img/disk.framing}
     \end{wrapfigure}
-	For \textbf{disk framing}, parallelization is a useful tool	to decrease computation time. Disk framing seperated larger-than-RAM datsets into several chunks of data, which are then treated seperately for the task to perform. Afterwords, results are merged again. With the help of parallelization, chunks of data can be processed parallely and so calculation time is reduced.\\
+	The opposite case to paralellized processes is the intended time-intensive, serial processing of Big Data with \textcolor{earthyellow}{\textbf{disk framing}}. In that setting we have data that exceeds the \textbf{RAM capacity} of the system, so that the data needs to a split up into several smaller chunks. These are then processed in portions that fit the available memory. Nevertheless, also for \textbf{disk framing}, parallelization is a useful tool to decrease computation time. The system chooses as many chunks of data as they fit into the RAM and then processes them parallely, so that use of the computational power of the system can be made, while the memory capacity limits the speed by the amount of data which is processed at once.\\
 	
 }
     \block{References}{
