@@ -76,47 +76,49 @@ mice_timer <- function(fun, fun_name, method = "simple", print_flag = TRUE,
 custom_color_map <- function(test_mode = "runtime", os_test = FALSE) {
     # Define vector containing the custom color map.
     colourvec <- c("cyan2", "blue3", "darkorchid3", "deeppink2",
-                "sienna2", "red2", "yellow1", "green1", "springgreen4")
+                "sienna2", "red2", "yellow1", "green1", "springgreen4", "coral3")
     colourtable <- cbind(colourvec,
                         c("foreach", "parlmice", "parLapply", "mice.par",
                         "furrr", "serial", "foreach_fork", "parlmice_fork",
-                        "parLapply_fork"))
+                        "parLapply_fork", "future.apply"))
 
     # Switch through different test modes with specifications of os_test,
     # that is, if the parallel backend is evaluated as well.
     if (test_mode == "runtime" & os_test == FALSE) {
         map <- scale_colour_manual("",
-            breaks = c("foreach", "parlmice", "parLapply", "mice.par", "furrr", "serial"),
+            breaks = c("foreach", "parlmice", "parLapply", "mice.par", "furrr", "serial", "future.apply"),
             values = c("foreach" = colourvec[1], "parlmice" = colourvec[2],
                         "parLapply" = colourvec[3], "mice.par" = colourvec[4],
-                        "furrr" = colourvec[5], "serial" = colourvec[6])
+                        "furrr" = colourvec[5], "serial" = colourvec[6],
+                       "future.apply" = colourvec[10])
         )
     } else if (test_mode == "runtime" & os_test == TRUE) {
         map <- scale_colour_manual("",
             breaks = c("foreach", "parlmice", "parLapply", "mice.par", "furrr",
-                        "serial", "foreach_fork", "parlmice_fork", "parLapply_fork"),
+                        "serial", "foreach_fork", "parlmice_fork", "parLapply_fork", "future.apply"),
             values = c("foreach" = colourvec[1], "parlmice" = colourvec[2],
                         "parLapply" = colourvec[3], "mice.par" = colourvec[4],
                         "furrr" = colourvec[5], "serial" = colourvec[6],
                         "foreach_fork" = colourvec[7], "parlmice_fork" = colourvec[8],
-                        "parLapply_fork" = colourvec[9])
+                        "parLapply_fork" = colourvec[9], "future.apply" = colourvec[10])
         )
     } else if (test_mode == "speed_up" & os_test == FALSE) {
         map <- scale_colour_manual("",
-            breaks = c("foreach", "parlmice", "parLapply", "mice.par", "furrr"),
+            breaks = c("foreach", "parlmice", "parLapply", "mice.par", "furrr", "future.apply"),
             values = c("foreach" = colourvec[1], "parlmice" = colourvec[2],
                         "parLapply" = colourvec[3], "mice.par" = colourvec[4],
-                        "furrr" = colourvec[5])
+                        "furrr" = colourvec[5]), "future.apply" = colourvec[10]
         )
     } else if (test_mode == "speed_up" & os_test == TRUE) {
         map <- scale_colour_manual("",
             breaks = c("foreach", "parlmice", "parLapply", "mice.par", "furrr"
-                        , "foreach_fork", "parlmice_fork", "parLapply_fork"),
+                        , "foreach_fork", "parlmice_fork", "parLapply_fork",
+                       "future.apply"),
             values = c("foreach" = colourvec[1], "parlmice" = colourvec[2],
                         "parLapply" = colourvec[3], "mice.par" = colourvec[4],
                         "furrr" = colourvec[5],
                         "foreach_fork" = colourvec[7], "parlmice_fork" = colourvec[8],
-                        "parLapply_fork" = colourvec[9])
+                        "parLapply_fork" = colourvec[9], "future.apply" = colourvec[10])
         )
     } else {
        stop("Custom color map: This combination of arguments is not valid.")

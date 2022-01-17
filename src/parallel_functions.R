@@ -93,6 +93,25 @@ furrr_wrap <- function(data, num_imp, seed, num_cores, backend, n.imp.core = NUL
     }
 }
 
+# Wrapper function for a parallel call of mice using the future.apply
+# package and the future_lapply function.
+future_wrap <- function(data, num_imp, seed, num_cores, backend){
+  plan(multisession, workers = num_cores)
+  imps <- future_lapply(X = 1:num_cores, function(None){
+    mice(data = data, m = (num_imp / num_cores), maxit = 5,
+         seed = seed, printFlag = FALSE)
+  })
+  
+  imp <- imps[[1]]
+  if (length(imps) >= 2) {
+    for (i in 2:length(imps)) {
+      imp <- ibind(imp, imps[[i]])
+    }
+    return(imp)
+  } else if (length(imps) == 1) {
+    return(imp)
+  }
+}
 
 # Wrapper function for a parallel call of mice using the par.mice
 # function.
