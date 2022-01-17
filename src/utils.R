@@ -1,11 +1,13 @@
 # utils.R
 # ------------------------------------------------ #
 # This R script contains helper functions for the
-# benchmarks and analysis that is performed in this
+# benchmarks and analyses that are performed in this
 # study.
 # ------------------------------------------------ #
 
+library(tidyverse)
 library(testit)
+library(xtable)
 
 
 # Returns the first n powers of 2.
@@ -121,4 +123,45 @@ custom_color_map <- function(test_mode = "runtime", os_test = FALSE) {
     }
 
     return(map)
+}
+
+
+
+# Create LaTeX code for a table representation of some data.
+table_to_latex <- function(data, export_filename) {
+    print(xtable(data, type = "latex"), file = export_filename)
+}
+
+
+# Tabulate runtime data from the core benchmark.
+# The data can be provided as a data.frame object or
+# as a string containing the file path to an .RData
+# file which contains an object called "runtime_data".
+tabulate_core_benchmark <- function(data) {
+    if (class(data) == "character") {
+        load(data)
+    } else if (class(data) == "data.frame") {
+        runtime_data <- data
+    } else {
+       stop("This data type is not supported.")
+    }
+
+    # Aggregate the data from each run by the average.
+    runtime_data_group <- runtime_data %>%
+        group_by(fun_name, cores) %>%
+        summarize(
+            avg_user_time = mean(user_time, na.rm = TRUE),
+            avg_system_time = mean(system_time, na.rm = TRUE),
+            avg_elapsed_time = mean(elapsed_time, na.rm = TRUE),
+            avg_speed_up = mean(speed_up, na.rm = TRUE)) %>%
+        filter(cores == max(runtime_data$cores))
+    colnames(runtime_data_group) <- c("Function", "Cores", "Avg. user time",
+                                    "Avg. system time", "Avg. elapsed time",
+                                    "Avg. speed up")
+
+    # Export table data to LaTex code.
+    table_to_latex(
+        data = runtime_data_group,
+        export_filename = "poster/tables/table_benchmark_core.tex"
+    )
 }
