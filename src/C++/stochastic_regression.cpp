@@ -1,4 +1,4 @@
-// mc_study.cpp
+// stochastic_regression.cpp
 /*
     This program performs a stochastic regression imputation
     for a target variable y with missing values using completely
@@ -10,12 +10,12 @@
     https://eigen.tuxfamily.org/
     
     To comopile this program use:
-    $ g++ -I eigen-3.4.0 stochastic_regression.cpp -o stochastic_regression.out -std=c++17 (serial)
-    $ g++ -I eigen-3.4.0 stochastic_regression.cpp -o stochastic_regression.out -std=c++17 -lpthread (parallel)
-    $ clang++ -I eigen-3.4.0 stochastic_regression.cpp -o stochastic_regression.out -std=c++17 (serial)
-    $ clang++ -I eigen-3.4.0 stochastic_regression.cpp -o stochastic_regression.out -std=c++17 -lpthread (parallel)
+    (serial) $ g++ -I eigen-3.4.0 stochastic_regression.cpp -o stochastic_regression.out -std=c++17 
+    (parallel) $ g++ -I eigen-3.4.0 stochastic_regression.cpp -o stochastic_regression.out -std=c++17 -lpthread 
+    (serial) $ clang++ -I eigen-3.4.0 stochastic_regression.cpp -o stochastic_regression.out -std=c++17 
+    (parallel) $ clang++ -I eigen-3.4.0 stochastic_regression.cpp -o stochastic_regression.out -std=c++17 -lpthread 
 
-    To run it type
+    To run it, type
     $ ./stochastic_regression.out
 */
 
@@ -26,6 +26,7 @@
 #include <vector>
 #include <fstream>
 #include <thread>
+#include <future>
 #include <chrono>
 
 #include <Eigen/Dense>
@@ -202,26 +203,58 @@ Eigen::MatrixXd multiple_imputation(int num_imp, Eigen::MatrixXd X_miss, Eigen::
 
     return imputations;
 }
+
+
+// Performs M multiple imputations using stochastic_regression
+// and a Bayesian linear model. This function wraps the calculation
+// output for the use in a parallel setting.
+void parallel_multiple_imputation(int num_imp, Eigen::MatrixXd X_miss, Eigen::MatrixXd X_obs, Eigen::VectorXd y_obs, std::promise<Eigen::MatrixXd> && p) 
+{   
+    Eigen::MatrixXd imputations(X_obs.rows() + X_miss.rows(), num_imp);
+
+    for (int m = 0; m < num_imp; m++)
+    {
+        // Calculate imputations for y and concantenate to one vector.
+        Eigen::VectorXd y_imp = stochastic_regression_imputation(X_miss, X_obs, y_obs);
+        Eigen::VectorXd y_complete(y_obs.size() + y_imp.size());
+        y_complete << y_obs, y_imp;
+        imputations.col(m) = y_complete;
+    }
+
+    p.set_value(imputations);
+}
+
+
+// Calculates the time difference between "end" and "begin" and prints
+// the result to the terminal.
+void print_runtime(std::chrono::steady_clock::time_point begin, std::chrono::steady_clock::time_point end, const std::string & msg)
+{
+    std::cout << msg << " Runtime = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << " [µs]" << std::endl;
+    std::cout << msg << " Runtime = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() / 1e6 << " [s]" << std::endl;
+    std::cout << std::endl;
+}
  
 
 int main() 
 {   
+    // Imputation parameters.
+    int num_imp = 10000;
+
     // Load the data.
     Eigen::MatrixXd X_miss = read_matrix_csv("data/X_miss.csv");
     Eigen::VectorXd y_miss = read_matrix_csv("data/y_miss.csv");
     Eigen::MatrixXd X_obs = read_matrix_csv("data/X_obs.csv");
     Eigen::VectorXd y_obs = read_matrix_csv("data/y_obs.csv");
-    Eigen::MatrixXd imputations;
+    Eigen::MatrixXd imputations(X_obs.rows() + X_miss.rows(), num_imp);
 
-    // Imputation parameters.
-    int num_imp = 10000;
+    std::chrono::steady_clock::time_point begin, end;
 
     // Calculate one imputation.
     //Eigen::VectorXd y_imp = stochastic_regression_imputation(X_miss, X_obs, y_obs);
     //std::cout << y_imp << std::endl;
 
-    // Calculate multiple imputations.
-    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+    // Calculate multiple imputations in serial execution.
+    begin = std::chrono::steady_clock::now();
     imputations = multiple_imputation(num_imp, X_miss, X_obs, y_obs);
     //std::cout << imputations << std::endl;
 
@@ -230,20 +263,23 @@ int main()
         std::cout << "Mean of imputation " << i << " is " << imputations.col(i).mean() << std::endl;
     }*/
 
-    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-    std::cout << "(Serial) Runtime = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << " [µs]" << std::endl;
-    std::cout << "(Serial) Runtime = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() / 1e6 << " [s]" << std::endl;
-    std::cout << std::endl;
+    end = std::chrono::steady_clock::now();
+    print_runtime(begin, end, "(Serial)");
 
     // Parallel version using std::thread. Here the number of
     // multiple imputations is distributed to different threads.
     int num_cores = std::thread::hardware_concurrency();
     begin = std::chrono::steady_clock::now();
+    
     std::vector<std::thread> threads;
+    std::vector<std::future<Eigen::MatrixXd>> futures;
 
     for (int i = 0; i < num_cores; i++) 
     {
-        threads.push_back(std::thread(multiple_imputation, num_imp / num_cores, X_miss, X_obs, y_obs));
+        //threads.push_back(std::thread(multiple_imputation, num_imp / num_cores, X_miss, X_obs, y_obs));
+        std::promise<Eigen::MatrixXd> p;
+        futures.push_back(p.get_future());
+        threads.push_back(std::thread(parallel_multiple_imputation, num_imp / num_cores, X_miss, X_obs, y_obs, std::move(p)));
     }
     
     for (auto &th : threads) 
@@ -251,10 +287,17 @@ int main()
         th.join();
     }
 
+    // Get the results from the parallel execution and 
+    // assemble them in a matrix.
+    for (auto &f : futures) 
+    {   
+        // TODO: Fix block start index for columns in every iteration.
+        imputations.block(0, (num_imp / num_cores) - 1, imputations.rows(), num_imp / num_cores) = f.get();
+    }
+    
     end = std::chrono::steady_clock::now();
     std::cout << "Running in on " << num_cores << " core(s)." << std::endl;
-    std::cout << "(Parallel) Runtime = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << " [µs]" << std::endl;
-    std::cout << "(Parallel) Runtime = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() / 1e6 << " [s]" << std::endl;
+    print_runtime(begin, end, "(Parallel)");
     
     return 0;
 }
