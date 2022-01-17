@@ -107,7 +107,7 @@ custom_color_map <- function(test_mode = "runtime", os_test = FALSE) {
             breaks = c("foreach", "parlmice", "parLapply", "mice.par", "furrr", "future.apply"),
             values = c("foreach" = colourvec[1], "parlmice" = colourvec[2],
                         "parLapply" = colourvec[3], "mice.par" = colourvec[4],
-                        "furrr" = colourvec[5]), "future.apply" = colourvec[10]
+                        "furrr" = colourvec[5], "future.apply" = colourvec[10])
         )
     } else if (test_mode == "speed_up" & os_test == TRUE) {
         map <- scale_colour_manual("",

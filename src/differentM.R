@@ -5,6 +5,7 @@ library(doParallel)
 library(tidyverse)
 library(furrr)
 library(ggpubr)
+library(future.apply)
 
 source("dataGenerator.R")
 
@@ -23,6 +24,7 @@ miceParTimes <- list()
 foreachTimes <- list()
 parLapplyTimes <- list()
 furrrTimes <- list()
+futureTimes <- list()
 
 
 for (i in imputations){
@@ -80,6 +82,14 @@ for (i in imputations){
                                              num_cores = nCores,
                                              backend = "PSOCK")))
   
+  # future
+  futureTimes <- c(futureTimes,
+                   system.time(future_wrap(data = dat, 
+                                           num_imp = i,
+                                           seed = seed,
+                                           num_cores = nCores,
+                                           backend = "PSOCK")))
+  
   
   print(paste0("Finished ", i, " imputations."))
   
@@ -92,6 +102,7 @@ runtimeMicePar <- numeric()
 runtimeForeach <- numeric()
 runtimeParlapply <- numeric()
 runtimeFurrr <- numeric()
+runTimeFuture <- numeric()
 idx <- seq(3, 45, 5)
 
 for (i in idx){
@@ -101,16 +112,18 @@ for (i in idx){
   runtimeForeach <- c(runtimeForeach, foreachTimes[[i]])
   runtimeParlapply <- c(runtimeParlapply, parLapplyTimes[[i]])
   runtimeFurrr <- c(runtimeFurrr, furrrTimes[[i]])
+  runTimeFuture <- c(runTimeFuture, futureTimes[[i]])
 }
 
 # create df for time
 impTimes <- data.frame(
   Runtime = c(runtimeMice, runtimeParlmice, runtimeMicePar,
-              runtimeForeach, runtimeParlapply, runtimeFurrr),
-  M = c(rep(imputations, 6)),
+              runtimeForeach, runtimeParlapply, 
+              runtimeFurrr, runTimeFuture),
+  M = c(rep(imputations, 7)),
   Method = c(rep("serial", 9), rep("parlmice", 9), rep("mice.par", 9),
              rep("foreach", 9), rep("parLapply", 9),
-             rep("furrr", 9))
+             rep("furrr", 9), rep("future.apply", 9))
 )
 
 # create df for speedup
@@ -119,11 +132,12 @@ impSpeedup <- data.frame(
               runtimeMice/runtimeMicePar,
               runtimeMice/runtimeForeach,
               runtimeMice/runtimeParlapply,
-              runtimeMice/runtimeFurrr),
-  M = c(rep(imputations, 5)),
+              runtimeMice/runtimeFurrr,
+              runtimeMice/runTimeFuture),
+  M = c(rep(imputations, 6)),
   Method = c(rep("parlmice", 9), rep("mice.par", 9),
              rep("foreach", 9), rep("parLapply", 9),
-             rep("furrr", 9))
+             rep("furrr", 9), rep("future.apply", 9))
 )
 
 # saving the dataframes
