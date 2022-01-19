@@ -143,20 +143,31 @@ for (i in 1:10){
   print(paste0("Iteration ", i, " ended."))
 }
 
+impTimesComplete <- do.call("rbind", dfListImp)
+impSpeedupComplete <- do.call("rbind", dfListSpeed)
+
+impTimesAvg <- impTimesComplete %>% dplyr::group_by(Method, M) %>% 
+  summarise(AvgRuntime = mean(Runtime))
+
+impSpeedupAvg <- impSpeedupComplete %>% dplyr::group_by(Method, M) %>% 
+  summarise(AvgSpeedup = mean(Speedup))
 
 # saving the dataframes
-# save(impTimes, impSpeedup, file = "miTimeSpeedup.RData")
+# save(impTimesComplete, impSpeedupComplete, 
+#      impTimesAvg, impSpeedupAvg, file = "differentM.RData")
+
+
 
 source("utils.R")
 
 # plot m vs runtime
-runtimePlot <- ggplot(data = impTimes, aes(x = M, y = Runtime, color=Method)) + 
+runtimePlot <- ggplot(data = impTimesAvg, aes(x = M, y = AvgRuntime, color=Method)) + 
   geom_line() + 
   geom_point() +
   scale_x_continuous(breaks = c(detectCores(), seq(16, 128, 16))) +
   custom_color_map(test_mode = "runtime", os_test = FALSE)
 
-speedupPlot <- ggplot(data = impSpeedup, aes(x = M, y = Speedup, color=Method)) + 
+speedupPlot <- ggplot(data = impSpeedupAvg, aes(x = M, y = AvgSpeedup, color=Method)) + 
   geom_line() + 
   geom_point() +
   scale_x_continuous(breaks = c(detectCores(), seq(16, 128, 16))) +
