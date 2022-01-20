@@ -156,6 +156,8 @@ impSpeedupAvg <- impSpeedupComplete %>% dplyr::group_by(Method, M) %>%
 # save(impTimesComplete, impSpeedupComplete, 
 #      impTimesAvg, impSpeedupAvg, file = "differentM.RData")
 
+# load data in case you don't want to run the script
+# load("../data/differentM.RData")
 
 
 source("utils.R")

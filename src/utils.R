@@ -75,8 +75,8 @@ mice_timer <- function(fun, fun_name, method = "simple", print_flag = TRUE,
 # The return value can be added to a ggplot object.
 custom_color_map <- function(test_mode = "runtime", os_test = FALSE) {
     # Define vector containing the custom color map.
-    colourvec <- c("cyan2", "blue3", "darkorchid3", "deeppink2",
-                "sienna2", "red2", "yellow1", "green1", "springgreen4", "coral3")
+    colourvec <- c("green4", "blue3", "magenta4", "gold3",
+                "slategray", "red3", "green", "turquoise1", "magenta", "thistle3")
     colourtable <- cbind(colourvec,
                         c("foreach", "parlmice", "parLapply", "mice.par",
                         "furrr", "serial", "foreach_fork", "parlmice_fork",
