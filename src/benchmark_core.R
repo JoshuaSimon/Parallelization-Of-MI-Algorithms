@@ -113,11 +113,11 @@ benmark_imputation <- function(data, num_imp, cores, runs = 5,
     }
 
     # Calculate speed up and estimated parallelism.
-    serial_time <- mean(runtime_data$elapsed_time[runtime_data$fun_name == "serial"])
+    serial_time <- mean(runtime_data$elapsed_time[runtime_data$fun_name == "mice (serial)"])
     runtime_data$speed_up <- serial_time / runtime_data$elapsed_time
-    runtime_data$parallelism[runtime_data$fun_name != "serial"] <- estimate_parallelism(
-        runtime_data$speed_up[runtime_data$fun_name != "serial"],
-        runtime_data$cores[runtime_data$fun_name != "serial"])
+    runtime_data$parallelism[runtime_data$fun_name != "mice (serial)"] <- estimate_parallelism(
+        runtime_data$speed_up[runtime_data$fun_name != "mice (serial)"],
+        runtime_data$cores[runtime_data$fun_name != "mice (serial)"])
 
     return(runtime_data)
 }
@@ -128,7 +128,7 @@ benmark_imputation <- function(data, num_imp, cores, runs = 5,
 benmark_plot <- function(runtime_data, cores, test_mode = "runtime", os_test = FALSE) {
     # Average all serial data.
     serial_time <- mean(runtime_data$elapsed_time[runtime_data$fun_name == "serial"])
-    runtime_data$elapsed_time[runtime_data$fun_name == "serial"] <- serial_time
+    runtime_data$elapsed_time[runtime_data$fun_name == "mice (serial)"] <- serial_time
 
     # Aggregate data from muliple benchmark runs.
     runtime_data_group <- runtime_data %>%
@@ -155,7 +155,8 @@ benmark_plot <- function(runtime_data, cores, test_mode = "runtime", os_test = F
         custom_color_map(test_mode = test_mode, os_test = os_test) +
         ggtitle(title) +
         scale_x_continuous(breaks = cores) +
-        xlab("Number of CPU cores") + ylab(label)
+        xlab("Number of CPU cores") + ylab(label) +
+        theme_light()
 
     return(plot)
 }
@@ -203,7 +204,8 @@ benchmark_plot_cpu_time <- function(runtime_data, num_cores, os_test = FALSE) {
         custom_color_map(test_mode = "runtime", os_test = os_test) +
         ggtitle(title) +
         #scale_x_continuous(breaks = cores) +
-        xlab("MI implementation method") + ylab(label)
+        xlab("MI implementation method") + ylab(label) +
+        theme_light()
 
     return(plot)
 }

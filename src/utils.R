@@ -85,12 +85,12 @@ custom_color_map <- function(test_mode = "runtime", os_test = FALSE) {
         map <- scale_color_manual("",
             breaks = c("mice (serial)", "parlmice", "mice.par",
                        "foreach", "parLapply", "furrr", "future.apply"),
-            values = c("mice (serial)" = colorvec[1], 
-                       "parlmice" = colorvec[2], 
+            values = c("mice (serial)" = colorvec[1],
+                       "parlmice" = colorvec[2],
                        "mice.par" = colorvec[4],
-                       "foreach" = colorvec[5], 
-                       "parLapply" = colorvec[7], 
-                       "furrr" = colorvec[9], 
+                       "foreach" = colorvec[5],
+                       "parLapply" = colorvec[7],
+                       "furrr" = colorvec[9],
                        "future.apply" = colorvec[10])
         )
     } else if (test_mode == "runtime" & os_test == TRUE) {
@@ -99,26 +99,26 @@ custom_color_map <- function(test_mode = "runtime", os_test = FALSE) {
                        "mice.par", "foreach", "foreach_fork",
                        "parLapply", "parLapply_fork",
                        "furrr", "future.apply"),
-            values = c("mice (serial)" = colorvec[1], 
-                       "parlmice" = colorvec[2], 
+            values = c("mice (serial)" = colorvec[1],
+                       "parlmice" = colorvec[2],
                        "parlmice_fork" = colorvec[3],
-                       "mice.par" = colorvec[4], 
-                       "foreach" = colorvec[5], 
+                       "mice.par" = colorvec[4],
+                       "foreach" = colorvec[5],
                        "foreach_fork" = colorvec[6],
-                       "parLapply" = colorvec[7], 
+                       "parLapply" = colorvec[7],
                        "parLapply_fork" = colorvec[8],
-                       "furrr" = colorvec[9], 
+                       "furrr" = colorvec[9],
                        "future.apply" = colorvec[10])
         )
     } else if (test_mode == "speed_up" & os_test == FALSE) {
         map <- scale_color_manual("",
             breaks = c("parlmice", "mice.par",
                        "foreach", "parLapply", "furrr", "future.apply"),
-            values = c("parlmice" = colorvec[2], 
+            values = c("parlmice" = colorvec[2],
                        "mice.par" = colorvec[4],
-                       "foreach" = colorvec[5], 
-                       "parLapply" = colorvec[7], 
-                       "furrr" = colorvec[9], 
+                       "foreach" = colorvec[5],
+                       "parLapply" = colorvec[7],
+                       "furrr" = colorvec[9],
                        "future.apply" = colorvec[10])
         )
     } else if (test_mode == "speed_up" & os_test == TRUE) {
@@ -127,14 +127,14 @@ custom_color_map <- function(test_mode = "runtime", os_test = FALSE) {
                        "mice.par", "foreach", "foreach_fork",
                        "parLapply", "parLapply_fork",
                        "furrr", "future.apply"),
-            values = c("parlmice" = colorvec[2], 
+            values = c("parlmice" = colorvec[2],
                        "parlmice_fork" = colorvec[3],
-                       "mice.par" = colorvec[4], 
-                       "foreach" = colorvec[5], 
+                       "mice.par" = colorvec[4],
+                       "foreach" = colorvec[5],
                        "foreach_fork" = colorvec[6],
-                       "parLapply" = colorvec[7], 
+                       "parLapply" = colorvec[7],
                        "parLapply_fork" = colorvec[8],
-                       "furrr" = colorvec[9], 
+                       "furrr" = colorvec[9],
                        "future.apply" = colorvec[10])
         )
     } else {
