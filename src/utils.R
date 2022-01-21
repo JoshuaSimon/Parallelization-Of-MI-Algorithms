@@ -75,7 +75,7 @@ mice_timer <- function(fun, fun_name, method = "simple", print_flag = TRUE,
 # The return value can be added to a ggplot object.
 custom_color_map <- function(test_mode = "runtime", os_test = FALSE) {
     # Define vector containing the custom color map.
-    colorvec <- c("red3", "blue3", "turquoise1", "gold",
+    colorvec <- c("red3", "blue3", "turquoise1", "gold3",
                   "green4", "green", "magenta4", "magenta",
                   "slategray", "thistle3")
 

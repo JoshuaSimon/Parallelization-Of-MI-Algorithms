@@ -78,7 +78,7 @@
     	    \includegraphics[width=5cm]{img/cpu.png}
     	    \caption{4 processors with 4 cores each}
     	\end{wrapfigure}
-         \textcolor{earthyellow}{\textbf{Parallelization}} is a technique to fasten time-consuming computations. It uses several  cores on a \textbf{CPU} parallely and splits up the computational work on them. Afterwords, the results are merged. This can reduce the runtime significantly. Parallelization is nevertheless limited to a certain kind of tasks: The computations to be parallelized must be independent from each other, as information cannot be cross-accessed over the cores while the process is running.\\
+         \textcolor{earthyellow}{\textbf{Parallelization}} is a technique to fasten time-consuming computations. It uses several  cores on a \textbf{CPU} parallely and splits up the computational work between the cores. Afterwards, the results are merged. This can reduce the runtime significantly. The use of parallelization is however limited to certain tasks: The computations to be parallelized must be independent from each other, as information cannot be cross-accessed over the cores while the process is running.\\
     }
 
 	\block{Theory}{
@@ -88,12 +88,12 @@
 			\caption{Amdahls Law}
 		\end{wrapfigure}
 		In \textcolor{earthyellow}{\textbf{parallel programming}}, the multiple cores of a computational system want to be used best to decrease computation time. Gene \textbf{Amdahl} was the first one to desribe the boundaries of that project: Every parallel process also requires additional workload, so called "data management housekeeping". The speed up through parallel processing will tend to 0 at a certain amount of processing units involved, as this \textbf{overhead} workload exceeds the capacity of the computational unit which it is assigned to.\\
-		\textcolor{earthyellow}{\textbf{Multiple imputation}} is a method to complete a dataset with missing information. It relies on the estimation of the missing values through different methods. What is common to them is that we use not a single imputation run, but several. The results of all imputation runs are then merged and lead to realistic uncertainty of the estimators given the missing data. It is prone to be parallelized, as the several imputation runs can be processed independend of each other on different cores and easily merged afterwards. 
+		\textcolor{earthyellow}{\textbf{Multiple imputation}} is a method to complete a dataset with missing data. It relies on the estimation of the missing values through different methods. What is common to them is that not a single imputation run is used, but several. The results of all imputation runs are then merged and lead to realistic uncertainty of the estimators given the missing data. It is prone to be parallelized, as the several imputation runs can be processed independend of each other on different cores and easily merged afterwards. 
 	}
 	\block{Methodology}{
-	As the \textcolor{earthyellow}{\textbf{dataset}} we used a simple data generator of normally distributed random variables. The data set created contains 10 variables, of which some depend on each other. The sample size is n=10000. Parallelizationfavors complex data sets, so the amount of variables and their interdependency should not be to small.\\
+	As the \textcolor{earthyellow}{\textbf{dataset}} we used a simple data generator of normally distributed random variables. The data set created contains 10 variables, some of which depend on each other. The sample size is n=10000. Parallelization favors complex data sets, so the amount of variables and their interdependency should not be to small.\\
 	\textcolor{earthyellow}{\textbf{Time measurement}} was done with the \textit{system.time} function, which returns 3 values: User CPU-, User System- and Elapsed time. User CPU is the time needed for the current task such as an execution in R. System CPU describes the time needed by the operating system to organize that task such as opening folders or asking for the System time. Elapsed time is the wall clock time that passed while the function and background processes were running.\\
-	The \textcolor{earthyellow}{\textbf{method}} of the \textcolor{earthyellow}{\textbf{mice}} algorithm was set on defaut, pmm.\\
+	The \textcolor{earthyellow}{\textbf{method}} of the \textcolor{earthyellow}{\textbf{mice}} algorithm was set on defaut for numeric data, pmm.\\
 	The \textcolor{earthyellow}{\textbf{speed up}} value is calculated by the serial time (runtime without parallelization) divided by the runtime of the current parallelization implementation \cite{cite:chapple2016mastering}. Values below one show that the parallelized run took longer than the serial run.\\
 	}
 
@@ -108,8 +108,8 @@
         \vspace{1em}
        
        	\vspace{1em}
-			\begin{tikzfigure}[Runtime and Speedup from 1 up to 128 Imputation runs]
-				\includegraphics[width=1\linewidth]{img/runtime_nimp_speedup_resized}
+			\begin{tikzfigure}[Runtime and Speedup from 4 up to 128 Imputation runs on a quad-core CPU]
+				\includegraphics[width=1\linewidth]{img/different_m_comparison}
 			\end{tikzfigure}
        	\vspace{1em}
        
@@ -168,7 +168,7 @@
     \begin{wrapfigure}{r}{6cm}
     	\includegraphics[width=5cm]{img/disk.framing}
     \end{wrapfigure}
-	The opposite case to paralellized processes is the intended time-intensive, serial processing of Big Data with \textcolor{earthyellow}{\textbf{disk framing}}. In that setting we have data that exceeds the \textbf{RAM capacity} of the system, so that the data needs to a split up into several smaller chunks. These are then processed in portions that fit the available memory. Nevertheless, also for \textbf{disk framing}, parallelization is a useful tool to decrease computation time. The system chooses as many chunks of data as they fit into the RAM and then processes them parallely, so that use of the computational power of the system can be made, while the memory capacity limits the speed by the amount of data which is processed at once.\\
+	The opposite case to paralellized processes is the intended time-intensive, serial processing of Big Data with \textcolor{earthyellow}{\textbf{disk framing}}. In that setting we have data that exceeds the \textbf{RAM capacity} of the system, so that the data needs to a split up into several smaller chunks. These are then processed in portions that fit the available memory. Nevertheless, also for \textbf{disk framing}, parallelization is a useful tool to decrease computation time. The system chooses as many chunks of data as they fit into the RAM and then processes them in parallel, so that use of the computational power of the system can be made, while the memory capacity limits the speed by the amount of data which is processed at once.\\
 
 	Considering today's trends in parallel and high performance computing, \textcolor{earthyellow}{\textbf{scalability}} plays a big role. So-called distributed systems are used here. These can be seen as the fusion of several computers into one system, often referred to as a \textbf{computing cluster}. In order to run a computer program on such an architecture, a \textbf{message passing interface (MPI)} is used, which now handles the communication between multiple CPUs and their cores. Popular applications are cloud solutions like Amazon's AWS (Amazon Web Services). The R language can make use of MPI with packages like \textbf{Rmpi} or \textbf{pbdMPI} \cite{cite:chapple2016mastering} and together with the \textbf{OpenMPI} implementation utilize the lower level of parallelism \cite{cite:robey2021parallel}.
 	
