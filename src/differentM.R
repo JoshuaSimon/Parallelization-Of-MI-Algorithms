@@ -167,13 +167,19 @@ runtimePlot <- ggplot(data = impTimesAvg, aes(x = M, y = AvgRuntime, color=Metho
   geom_line() + 
   geom_point() +
   scale_x_continuous(breaks = c(detectCores(), seq(16, 128, 16))) +
-  custom_color_map(test_mode = "runtime", os_test = FALSE)
+  custom_color_map(test_mode = "runtime", os_test = FALSE) +
+  xlab("Number of Imputations M") + ylab("Average Runtime in seconds") +
+  ggtitle("Runtime of Multiple Imputations") + 
+  theme_light()
 
 speedupPlot <- ggplot(data = impSpeedupAvg, aes(x = M, y = AvgSpeedup, color=Method)) + 
   geom_line() + 
   geom_point() +
   scale_x_continuous(breaks = c(detectCores(), seq(16, 128, 16))) +
-  custom_color_map(test_mode = "speed_up", os_test = FALSE)
+  custom_color_map(test_mode = "speed_up", os_test = FALSE) +
+  xlab("Number of Imputations M") + ylab("Average Speed Up") +
+  ggtitle("Speed Up of Multiple Imputations Running in Parallel") +
+  theme_light()
 
 # plot both next to each other
 ggarrange(runtimePlot, speedupPlot, ncol = 2, nrow = 1)
