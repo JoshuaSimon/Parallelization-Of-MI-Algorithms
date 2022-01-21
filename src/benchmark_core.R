@@ -127,7 +127,7 @@ benmark_imputation <- function(data, num_imp, cores, runs = 5,
 # results. The plots differ between runtime and speed up.
 benmark_plot <- function(runtime_data, cores, test_mode = "runtime", os_test = FALSE) {
     # Average all serial data.
-    serial_time <- mean(runtime_data$elapsed_time[runtime_data$fun_name == "serial"])
+    serial_time <- mean(runtime_data$elapsed_time[runtime_data$fun_name == "mice (serial)"])
     runtime_data$elapsed_time[runtime_data$fun_name == "mice (serial)"] <- serial_time
 
     # Aggregate data from muliple benchmark runs.
@@ -143,7 +143,7 @@ benmark_plot <- function(runtime_data, cores, test_mode = "runtime", os_test = F
         label <- "Runtime in seconds"
     } else if (test_mode == "speed_up") {
         plot <- ggplot(data = runtime_data_group %>%
-                        filter(fun_name != "serial"),
+                        filter(fun_name != "mice (serial)"),
                         aes(x = cores, y = avg_speed_up, color = fun_name))
         title <- "Speed Up of Multiple Imputations Running in Parallel"
         label <- "Speed Up"
