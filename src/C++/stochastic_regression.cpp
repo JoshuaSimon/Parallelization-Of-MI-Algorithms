@@ -6,25 +6,23 @@
     in parallel. The parallel implementation is based on C++'s 
     std::thread. For matrix computations the C++ header only 
     library Eigen is used. You need Eigen to compile this code.
-    Eigen is free software available at 
+    Eigen is free software and available at 
     https://eigen.tuxfamily.org/
     
-    To comopile this program use:
-    (serial) $ g++ -I eigen-3.4.0 stochastic_regression.cpp -o stochastic_regression.out -std=c++17 
-    (parallel) $ g++ -I eigen-3.4.0 stochastic_regression.cpp -o stochastic_regression.out -std=c++17 -lpthread 
-    (serial) $ clang++ -I eigen-3.4.0 stochastic_regression.cpp -o stochastic_regression.out -std=c++17 
-    (parallel) $ clang++ -I eigen-3.4.0 stochastic_regression.cpp -o stochastic_regression.out -std=c++17 -lpthread 
+    To comopile this program use one of the following:
+    $ g++ -I eigen-3.4.0 stochastic_regression.cpp -o stochastic_regression.out -std=c++2a -lpthread -O3
+    $ clang++ -I eigen-3.4.0 stochastic_regression.cpp -o stochastic_regression.out -std=c++17 -lpthread -O3
 
     To run it, type
     $ ./stochastic_regression.out
 */
 
 #include <iostream>
-#include <random>
+#include <fstream>
 #include <cmath>
+#include <random>
 #include <string>
 #include <vector>
-#include <fstream>
 #include <thread>
 #include <future>
 #include <chrono>
@@ -231,9 +229,26 @@ void print_runtime(std::chrono::steady_clock::time_point begin, std::chrono::ste
 {
     std::cout << msg << " Runtime = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << " [µs]" << std::endl;
     std::cout << msg << " Runtime = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() / 1e6 << " [s]" << std::endl;
-    std::cout << std::endl;
 }
  
+
+// Prints the global mean of an matrix to the terminal.
+// If col_means is ture, the mean for each column of 
+// the data matrix is printed.
+void print_means(Eigen::MatrixXd data, const std::string & msg, bool col_means = false)
+{
+    std::cout << msg << " Mean = " << data.mean() << std::endl;
+    std::cout << std::endl;
+
+    if (col_means) 
+    {
+        for (int i = 0; i < data.cols(); i++)
+        {
+            std::cout << "Mean of imputation " << i << " is " << data.col(i).mean() << std::endl;
+        }
+    }
+}
+
 
 int main() 
 {   
@@ -256,15 +271,10 @@ int main()
     // Calculate multiple imputations in serial execution.
     begin = std::chrono::steady_clock::now();
     imputations = multiple_imputation(num_imp, X_miss, X_obs, y_obs);
-    //std::cout << imputations << std::endl;
-
-    /*for (int i = 0; i < num_imp; i++)
-    {
-        std::cout << "Mean of imputation " << i << " is " << imputations.col(i).mean() << std::endl;
-    }*/
-
     end = std::chrono::steady_clock::now();
     print_runtime(begin, end, "(Serial)");
+    print_means(imputations, "(Serial)");
+    //std::cout << imputations << std::endl;
 
     // Parallel version using std::thread. Here the number of
     // multiple imputations is distributed to different threads.
@@ -276,7 +286,6 @@ int main()
 
     for (int i = 0; i < num_cores; i++) 
     {
-        //threads.push_back(std::thread(multiple_imputation, num_imp / num_cores, X_miss, X_obs, y_obs));
         std::promise<Eigen::MatrixXd> p;
         futures.push_back(p.get_future());
         threads.push_back(std::thread(parallel_multiple_imputation, num_imp / num_cores, X_miss, X_obs, y_obs, std::move(p)));
@@ -289,15 +298,17 @@ int main()
 
     // Get the results from the parallel execution and 
     // assemble them in a matrix.
+    int col_counter = 0;
     for (auto &f : futures) 
     {   
-        // TODO: Fix block start index for columns in every iteration.
-        imputations.block(0, (num_imp / num_cores) - 1, imputations.rows(), num_imp / num_cores) = f.get();
+        imputations.block(0, (num_imp / num_cores) * col_counter, imputations.rows(), num_imp / num_cores) = f.get();
+        col_counter++;
     }
     
     end = std::chrono::steady_clock::now();
-    std::cout << "Running in on " << num_cores << " core(s)." << std::endl;
+    std::cout << "Running in parallel on " << num_cores << " core(s)." << std::endl;
     print_runtime(begin, end, "(Parallel)");
+    print_means(imputations, "(Parallel)");
     
     return 0;
 }
