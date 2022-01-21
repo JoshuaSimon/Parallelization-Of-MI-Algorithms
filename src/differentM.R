@@ -117,7 +117,7 @@ for (i in 1:10){
                 runtimeForeach, runtimeParlapply, 
                 runtimeFurrr, runTimeFuture),
     M = c(rep(imputations, 7)),
-    Method = c(rep("serial", 9), rep("parlmice", 9), rep("mice.par", 9),
+    Method = c(rep("mice (serial)", 9), rep("parlmice", 9), rep("mice.par", 9),
                rep("foreach", 9), rep("parLapply", 9),
                rep("furrr", 9), rep("future.apply", 9))
   )
@@ -154,10 +154,10 @@ impSpeedupAvg <- impSpeedupComplete %>% dplyr::group_by(Method, M) %>%
 
 # saving the dataframes
 # save(impTimesComplete, impSpeedupComplete, 
-#      impTimesAvg, impSpeedupAvg, file = "differentM.RData")
+#      impTimesAvg, impSpeedupAvg, file = "../data/differentM.RData")
 
 # load data in case you don't want to run the script
-# load("../data/differentM.RData")
+load("../data/differentM.RData")
 
 
 source("utils.R")

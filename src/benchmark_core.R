@@ -38,7 +38,7 @@ benmark_imputation <- function(data, num_imp, cores, runs = 5,
     # Set up lists/vectors with functions and individual parameters for
     # benchmark executions.
     fun_calls <- list(mice_wrap, foreach_wrap, parlmice_wrap, parLapply_wrap, micemd_wrap, furrr_wrap)
-    fun_names <- c("serial", "foreach", "parlmice", "parLapply", "mice.par", "furrr")
+    fun_names <- c("mice (serial)", "foreach", "parlmice", "parLapply", "mice.par", "furrr")
     exe_types <- c("serial", "parallel", "parallel", "parallel", "parallel", "parallel")
     backends <- list("", "PSOCK", "PSOCK", "PSOCK", "", "")
 
