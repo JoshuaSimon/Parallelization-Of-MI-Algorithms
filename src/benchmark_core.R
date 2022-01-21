@@ -37,10 +37,13 @@ benmark_imputation <- function(data, num_imp, cores, runs = 5,
 
     # Set up lists/vectors with functions and individual parameters for
     # benchmark executions.
-    fun_calls <- list(mice_wrap, foreach_wrap, parlmice_wrap, parLapply_wrap, micemd_wrap, furrr_wrap)
-    fun_names <- c("mice (serial)", "foreach", "parlmice", "parLapply", "mice.par", "furrr")
-    exe_types <- c("serial", "parallel", "parallel", "parallel", "parallel", "parallel")
-    backends <- list("", "PSOCK", "PSOCK", "PSOCK", "", "")
+    fun_calls <- list(mice_wrap, foreach_wrap, parlmice_wrap,
+        parLapply_wrap, micemd_wrap, furrr_wrap, future_wrap)
+    fun_names <- c("mice (serial)", "foreach", "parlmice",
+        "parLapply", "mice.par", "furrr", "future.apply")
+    exe_types <- c("serial", "parallel", "parallel",
+        "parallel", "parallel", "parallel", "parallel")
+    backends <- list("", "PSOCK", "PSOCK", "PSOCK", "", "", "")
 
     # Perform parallel backend benchmark. This is only possible on
     # Linux or MacOS. Therefore the list of functions is extendend
