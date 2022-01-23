@@ -142,29 +142,6 @@
 
 
     \column{0.32}
-    \block{Comparison of Implementations}{
-    	
-    	\textbf{foreach::foreach} usability 
-		%\hspace{-1mm}\big{ \score{2.4}{5}} \hspace{1cm} runtime \hspace{-1mm}\big{ \score{2.4}{5}} \\
-    	\\
-    	\textbf{mice::parlmice} usability
-    	%\hspace{-1mm} \big{\score{2.4}{5}} %\\
-    	\\
-    	\textbf{micemd::mice.par} usability
-    	%\hspace{-1mm}\big{ \score{2.4}{5}} \\
-    	\\
-    	\textbf{parallel::parLapply} usability
-    	%\hspace{-1mm} \big{ \score{2.4}{5}} \\
-    	\\
-    	\textbf{furrr::future\_map} usability
-    	%\hspace{-1mm}\big{ \score{2.4}{5}} \\ 
-    	\\
-    	\textbf{future.apply::future\_lapply} usability
-    	%\hspace{-1mm} \big{\score{2.4}{5}} \\ 
-    	\\
-    	\centering{\textit{PSOCK} vs. \textit{FORK}}
-    }
-
     \block{Further Applications}{
     \begin{wrapfigure}{r}{6cm}
     	\includegraphics[width=5cm]{img/disk.framing}
@@ -174,6 +151,18 @@
 	Considering today's trends in parallel and high performance computing, \textcolor{earthyellow}{\textbf{scalability}} plays a big role. So-called distributed systems are used here. These can be seen as the fusion of several computers into one system, often referred to as a \textbf{computing cluster}. In order to run a computer program on such an architecture, a \textbf{message passing interface (MPI)} is used, which now handles the communication between multiple CPUs and their cores. Popular applications are cloud solutions like Amazon's AWS (Amazon Web Services). The R language can make use of MPI with packages like \textbf{Rmpi} or \textbf{pbdMPI} \cite{cite:chapple2016mastering} and together with the \textbf{OpenMPI} implementation utilize the lower level of parallelism \cite{cite:robey2021parallel}.
 	
 	}
+
+	\block{Conclusion}{
+		\begin{itemize}
+			\item Parallelization is a powerful technique to reduce the runtime of complex workloads.
+			\item \textbf{parLapply} generally has the best performance, because it not only utilizes parallelization, but also the vectorisation of the \textbf{apply} functions in R.
+			\item When parallelizing multiple imputations, mice's built in \textbf{parlmice} function is recommended. It utilizes parLapply under the hood, which results in good performance, but it's easier to use. \textbf{mice.par} should be avoided due to poor performance.
+			\item \textbf{parLapply} can be tricky to use inside of functions. \textbf{foreach, furr} and \\ \textbf{future.apply} are good alternatives that only perform marginally worse.
+			\item If RAM is an issue, \textbf{disk framing} in conjunction with parallelization is an alternative.
+			\item Running complex workloads on clusters or multi-CPU systems requires a \textbf{MPI} and is a lot more difficult to implement.
+		\end{itemize}
+	}
+	
 
     \block{References}{
         \vspace{-1em}
