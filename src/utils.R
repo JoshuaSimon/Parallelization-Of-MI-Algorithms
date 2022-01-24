@@ -172,11 +172,12 @@ tabulate_core_benchmark <- function(data) {
             avg_user_time = mean(user_time, na.rm = TRUE),
             avg_system_time = mean(system_time, na.rm = TRUE),
             avg_elapsed_time = mean(elapsed_time, na.rm = TRUE),
-            avg_speed_up = mean(speed_up, na.rm = TRUE)) %>%
+            avg_speed_up = mean(speed_up, na.rm = TRUE),
+            avg_parallelism = mean(parallelism)) %>%
         filter(cores == max(runtime_data$cores))
     colnames(runtime_data_group) <- c("Function", "Cores", "Avg. user time",
                                     "Avg. system time", "Avg. elapsed time",
-                                    "Avg. speed up")
+                                    "Avg. speed up", "Avg. parallelism")
 
     # Export table data to LaTex code.
     table_to_latex(

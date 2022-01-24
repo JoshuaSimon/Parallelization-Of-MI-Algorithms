@@ -85,15 +85,15 @@
 		\begin{wrapfigure}{r}{15cm}
 			\centering
 			\includegraphics[width=15cm]{img/600px-AmdahlsLaw.svg}
-			\caption{Amdahls Law}
+			\caption{Amdahl's Law}
 		\end{wrapfigure}
-		In \textcolor{earthyellow}{\textbf{parallel programming}}, the multiple cores of a computational system want to be used best to decrease computation time. Gene \textbf{Amdahl} was the first one to desribe the boundaries of that project: Every parallel process also requires additional workload, so called "data management housekeeping". The speed up through parallel processing will tend to 0 at a certain amount of processing units involved, as this \textbf{overhead} workload exceeds the capacity of the computational unit which it is assigned to.\\
+		In \textcolor{earthyellow}{\textbf{parallel programming}}, the multiple cores of a computational system want to be used best to decrease computation time. Gene \textbf{Amdahl} was the first one to desribe the boundaries of that project: Every parallel process also requires additional workload, so called "data management housekeeping". The speed up through parallel processing will tend to $0$ at a certain amount of processing units involved, as this \textbf{overhead} workload exceeds the capacity of the computational unit which it is assigned to.\\
 		\textcolor{earthyellow}{\textbf{Multiple imputation}} is a method to complete a dataset with missing data. It relies on the estimation of the missing values through different methods. What is common to them is that not a single imputation run is used, but several. The results of all imputation runs are then merged and lead to realistic uncertainty of the estimators given the missing data. It is prone to be parallelized, as the several imputation runs can be processed independend of each other on different cores and easily merged afterwards. 
 	}
 	\block{Methodology}{
-	As the \textcolor{earthyellow}{\textbf{dataset}} we used a simple data generator of normally distributed random variables. The data set created contains 10 variables, some of which depend on each other. The sample size is n=10000. Parallelization favors complex data sets, so the amount of variables and their interdependency should not be to small.\\
-	\textcolor{earthyellow}{\textbf{Time measurement}} was done with the \textit{system.time} function, which returns 3 values: User CPU-, User System- and Elapsed time. User CPU is the time needed for the current task such as an execution in R. System CPU describes the time needed by the operating system to organize that task such as opening folders or asking for the System time. Elapsed time is the wall clock time that passed while the function and background processes were running.\\
-	The \textcolor{earthyellow}{\textbf{method}} of the \textcolor{earthyellow}{\textbf{mice}} algorithm was set on defaut for numeric data, pmm.\\
+	As the \textcolor{earthyellow}{\textbf{dataset}} we used a simple data generator of normally distributed random variables. The data set created contains $10$ variables, some of which depend on each other. The sample size is $n = 10000$. Parallelization favors complex data sets, so the amount of variables and their interdependency should not be to small.\\
+	\textcolor{earthyellow}{\textbf{Time measurement}} was done with the \textit{system.time} function, which returns three values: User CPU-, User System- and Elapsed time. User CPU is the time needed for the current task such as an execution in R. System CPU describes the time needed by the operating system to organize that task such as opening folders or asking for the System time. Elapsed time is the wall clock time that passed while the function and background processes were running.\\
+	The \textcolor{earthyellow}{\textbf{method}} of the \textcolor{earthyellow}{\textbf{mice}} algorithm was set on defaut for numeric data, pmm \cite{van2018flexible}.\\
 	The \textcolor{earthyellow}{\textbf{speed up}} value is calculated by the serial time (runtime without parallelization) divided by the runtime of the current parallelization implementation \cite{cite:chapple2016mastering}. Values below one show that the parallelized run took longer than the serial run.\\
 	}
 
@@ -102,40 +102,39 @@
     \block{Results}{
         
         \vspace{1em}
-			\begin{tikzfigure}[Runtime and Speedup from 1 up to 16 cores]
+			\begin{tikzfigure}[Runtime and Speedup from $1$ up to $16$ cores for $M = 128$ imputations]
 				\includegraphics[width=1\linewidth]{img/runtime_ncores_speedup}
 			\end{tikzfigure}
         \vspace{1em}
        
        	\vspace{1em}
-			\begin{tikzfigure}[Runtime and Speedup from 4 up to 128 Imputation runs on a quad-core CPU]
+			\begin{tikzfigure}[Runtime and Speedup from $4$ up to $128$ Imputation runs on a quad-core CPU]
 				\includegraphics[width=1\linewidth]{img/different_m_comparison}
 			\end{tikzfigure}
        	\vspace{1em}
        
       	\vspace{1em}
-			%\begin{tikzfigure}[Time components for the different implementations on 16 cores]
-			%	\includegraphics[width=0.7\linewidth]{img/2022-01-15_benchmark_core_Linux_cpu_time}
-			%\end{tikzfigure}
-
-			\begin{tikztable}[Time components for the different implementations on 16 cores]
+			\begin{tikztable}[Time components for the different implementations for $M = 128$ imputations]
 				%\small		% reduce font size within the table
-				\begin{tabular}{rlrrrrr}
+				\begin{tabular}{rlrrrrrr}
 					\hline
-					& Function & Cores & Avg. user time & Avg. system time & Avg. elapsed time & Avg. speed up \\ 
+				    & Function & Cores \vline & & & Average & & \\ 
 					\hline
-					1 & foreach & 16 & 0.25 & 0.03 & 7.63 & 4.48 \\ 
-					2 & foreach\_fork & 16 & 0.21 & 0.17 & 7.03 & 5.15 \\ 
-					3 & furrr & 16 & 1.07 & 0.09 & 8.93 & 3.83 \\ 
-					4 & future.apply & 16 & 0.89 & 0.07 & 7.99 & 3.90 \\ 
-					5 & mice (serial) & 16 & 31.04 & 0.06 & 31.11 & 1.00 \\ 
-					6 & mice.par & 16 & 1.15 & 0.10 & 13.67 & 2.50 \\ 
-					7 & parLapply & 16 & 0.33 & 0.04 & 7.80 & 4.39 \\ 
-					8 & parLapply\_fork & 16 & 0.23 & 0.17 & 6.40 & 5.36 \\ 
-					9 & parlmice & 16 & 0.30 & 0.02 & 7.76 & 4.41 \\ 
-					10 & parlmice\_fork & 16 & 0.21 & 0.18 & 6.54 & 5.25 \\ 
+					& & \vline & User Time & System Time & Elapsed Time & Speed Up & Parallelism\\
 					\hline
-				\end{tabular}
+					\hline
+				    1 & foreach & $16$ & $0.25$ & $0.03$ & $7.63$ & $4.48$ & $0.83$ \\ 
+					2 & foreach\_fork & $16$ & $0.21$ & $0.17$ & $7.03$ & $5.15$ & $0.85$ \\ 
+					3 & furrr & $16$ & $1.07$ & $0.09$ & $8.93$ & $3.83$ & $0.79$ \\ 
+					4 & future.apply & $16$ & $0.89$ & $0.07$ & $7.99$ & $3.90$ & $0.79$ \\ 
+					5 & mice (serial) & $16$ & $31.04$ & $0.06$ & $31.11$ & $1.00$ &  - \\ 
+					6 & mice.par & $16$ & $1.15$ & $0.10$ & $13.67$ & $2.50$ & $0.64$ \\ 
+					7 & parLapply & $16$ & $0.33$ & $0.04$ & $7.80$ & $4.39$ & $0.82$ \\ 
+					8 & parLapply\_fork & $16$ & $0.23$ & $0.17$ & $6.40$ & $5.36$ & $0.87$ \\ 
+					9 & parlmice & $16$ & $0.30$ & $0.02$ & $7.76$ & $4.41$ & $0.82$ \\ 
+					10 & parlmice\_fork & $16$ & $0.21$ & $0.18$ & $6.54$ & $5.25$ & $0.86$ \\ 
+					 \hline
+				  \end{tabular}
 			\end{tikztable}
     	\vspace{1em} 
     }
