@@ -11,7 +11,7 @@
     
     To comopile this program use one of the following:
     $ g++ -I eigen-3.4.0 stochastic_regression.cpp -o stochastic_regression.out -std=c++2a -lpthread -O3
-    $ clang++ -I eigen-3.4.0 stochastic_regression.cpp -o stochastic_regression.out -std=c++17 -lpthread -O3
+    $ clang++ -I eigen-3.4.0 stochastic_regression.cpp -o stochastic_regression.out -std=c++2a -lpthread -O3
 
     To run it, type
     $ ./stochastic_regression.out
