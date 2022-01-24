@@ -38,7 +38,6 @@ class LinearModel
 public:
     double sigma;
     Eigen::VectorXd beta;
-    Eigen::VectorXd predictions;
     Eigen::VectorXd residuals;
     Eigen::MatrixXd design;
     Eigen::MatrixXd inv_matrix_prod;
@@ -46,6 +45,7 @@ public:
     LinearModel();
     ~LinearModel();
     void fit(Eigen::MatrixXd X, Eigen::VectorXd y);
+    Eigen::VectorXd predict(Eigen::MatrixXd X);
 };
 
 LinearModel::LinearModel()
@@ -54,6 +54,13 @@ LinearModel::LinearModel()
 
 LinearModel::~LinearModel()
 {
+}
+
+// Predicts y for a given Matrix X using the Matrix-Vector-Product
+// of X and beta.
+Eigen::VectorXd LinearModel::predict(Eigen::MatrixXd X)
+{
+    return(X * beta);
 }
 
 // Fit a linear model of the form y = X * beta + epsilon
@@ -77,7 +84,7 @@ void LinearModel::fit(Eigen::MatrixXd X, Eigen::VectorXd y)
     beta = inv_matrix_prod * beta;
 
     // Calculate the residuals.
-    predictions = X * beta;
+    Eigen::VectorXd predictions = predict(X);
     residuals = y - predictions;
     Eigen::VectorXd residuals_sq = residuals.array().pow(2);
 
@@ -209,16 +216,7 @@ Eigen::MatrixXd multiple_imputation(int num_imp, Eigen::MatrixXd X_miss, Eigen::
 void parallel_multiple_imputation(int num_imp, Eigen::MatrixXd X_miss, Eigen::MatrixXd X_obs, Eigen::VectorXd y_obs, std::promise<Eigen::MatrixXd> && p) 
 {   
     Eigen::MatrixXd imputations(X_obs.rows() + X_miss.rows(), num_imp);
-
-    for (int m = 0; m < num_imp; m++)
-    {
-        // Calculate imputations for y and concantenate to one vector.
-        Eigen::VectorXd y_imp = stochastic_regression_imputation(X_miss, X_obs, y_obs);
-        Eigen::VectorXd y_complete(y_obs.size() + y_imp.size());
-        y_complete << y_obs, y_imp;
-        imputations.col(m) = y_complete;
-    }
-
+    imputations = multiple_imputation(num_imp, X_miss, X_obs, y_obs);
     p.set_value(imputations);
 }
 
