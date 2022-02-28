@@ -81,7 +81,7 @@
     	\begin{wrapfigure}{l}{5cm}
     		\centering
     	    \includegraphics[width=5cm]{img/cpu.png}
-    	    \caption{4 processors with 4 cores each}
+    	    \caption{4 processors with 4 cores each \cite{cite:mattjones}}
     	\end{wrapfigure}
 		
         \textcolor{earthyellow}{\textbf{Parallelization}} is a technique to fasten time-consuming computations. It uses several  cores on a \textbf{CPU} parallely and splits up the computational work between the cores. Afterwards, the results are merged. This can reduce the runtime significantly. The use of parallelization is however limited to certain tasks: The computations to be parallelized must be independent from each other, as information cannot be cross-accessed over the cores while the process is running.\\
@@ -91,11 +91,11 @@
 		\begin{wrapfigure}{r}{15cm}
 			\centering
 			\includegraphics[width=15cm]{img/600px-AmdahlsLaw.svg}
-			\caption{Amdahl's Law}
+			\caption{Amdahl's Law \cite{cite:mattjones}}
 		\end{wrapfigure}
 
-		In \textcolor{earthyellow}{\textbf{parallel programming}}, the multiple cores of a computational system want to be used best to decrease computation time. Gene \textbf{Amdahl} was the first one to desribe the boundaries of that project: Every parallel process also requires additional workload, so called "data management housekeeping". The speed up through parallel processing will tend to $0$ at a certain amount of processing units involved, as this \textbf{overhead} workload exceeds the capacity of the computational unit which it is assigned to.\\
-		\textcolor{earthyellow}{\textbf{Multiple imputation}} is a method to complete a dataset with missing data. It relies on the estimation of the missing values through different methods. What is common to them is that not a single imputation run is used, but several. The results of all imputation runs are then merged and lead to realistic uncertainty of the estimators given the missing data. It is prone to be parallelized, as the several imputation runs can be processed independend of each other on different cores and easily merged afterwards. 
+		In \textcolor{earthyellow}{\textbf{parallel programming}}, the multiple cores of a computational system want to be used best to decrease computation time. Gene \textbf{Amdahl} was the first one to desribe the boundaries of that project: Every parallel process also requires additional workload, so called "data management housekeeping". The speed up through parallel processing will tend to $0$ at a certain amount of processing units involved, as this \textbf{overhead} workload exceeds the capacity of the computational unit which it is assigned to \cite{cite:mattjones}.\\
+		\textcolor{earthyellow}{\textbf{Multiple imputation MI}} is a method to complete a dataset with missing data. It relies on the estimation of the missing values through different methods. What is common to them is that not a single imputation run is used, but several. The results of all imputation runs are then merged and lead to realistic uncertainty of the estimators given the missing data. It is prone to be parallelized, as the several imputation runs can be processed independend of each other on different cores and easily merged afterwards \cite{van2018flexible}.
 	}
 
 	\block{Methodology}{
@@ -152,21 +152,23 @@
 
     \column{0.32}
     \block{Further Applications}{
-    \begin{wrapfigure}{r}{6cm}
-    	\includegraphics[width=5cm]{img/disk.framing}
-    \end{wrapfigure}
-	The opposite case to paralellized processes is the intended time-intensive, serial processing of Big Data with \textcolor{earthyellow}{\textbf{disk framing}}. In that setting we have data that exceeds the \textbf{RAM capacity} of the system, so that the data needs to a split up into several smaller chunks. These are then processed in portions that fit the available memory. Nevertheless, also for \textbf{disk framing}, parallelization is a useful tool to decrease computation time. The system chooses as many chunks of data as they fit into the RAM and then processes them in parallel, so that use of the computational power of the system can be made, while the memory capacity limits the speed by the amount of data which is processed at once.\\
+    %\begin{wrapfigure}{r}{6cm}
+    %	\includegraphics[width=5cm]{img/disk.framing}
+    %\end{wrapfigure}
+	The opposite case to paralellized processes is the intended time-intensive, serial processing of Big Data with \textcolor{earthyellow}{\textbf{disk framing}}. In that setting we have data that exceeds the \textbf{RAM capacity} of the system, so that the data needs to a split up into several smaller chunks. These are then processed in portions that fit the available memory. Nevertheless, also for \textbf{disk framing}, parallelization is a useful tool to decrease computation time. The system chooses as many chunks of data as they fit into the RAM and then processes them in parallel, so that use of the computational power of the system can be made, while the memory capacity limits the speed by the amount of data which is processed at once. \cite{cite:diskframe} \\
 
-	Considering today's trends in parallel and high performance computing, \textcolor{earthyellow}{\textbf{scalability}} plays a big role. So-called distributed systems are used here. These can be seen as the fusion of several computers into one system, often referred to as a \textbf{computing cluster}. In order to run a computer program on such an architecture, a \textbf{message passing interface (MPI)} is used, which now handles the communication between multiple CPUs and their cores. Popular applications are cloud solutions like Amazon's AWS (Amazon Web Services). The R language can make use of MPI with packages like \textbf{Rmpi} or \textbf{pbdMPI} \cite{cite:chapple2016mastering} and together with the \textbf{OpenMPI} implementation utilize the lower level of parallelism \cite{cite:robey2021parallel}.
+	Considering today's trends in parallel and high performance computing, \textcolor{earthyellow}{\textbf{scalability}} plays a big role. So-called distributed systems are used here. These can be seen as the fusion of several computers into one system, often referred to as a \textbf{computing cluster}. In order to run a computer program on such an architecture, a \textbf{message passing interface (MPI)} is used, which now handles the communication between multiple CPUs and their cores. Popular applications are cloud solutions like Amazon's AWS (Amazon Web Services). The R language can make use of MPI with packages like \textbf{Rmpi} or \textbf{pbdMPI} \cite{cite:chapple2016mastering} and together with the \textbf{OpenMPI} implementation utilize the lower level of parallelism. \cite{cite:robey2021parallel}
 	
 	}
 
 	\block{Conclusion}{
 		\begin{itemize}
+			\itemsep0em
 			\item Parallelization is a powerful technique to reduce the runtime of complex workloads.
 			\item \textbf{parLapply} generally has the best performance, because it not only utilizes parallelization, but also the vectorisation of the \textbf{apply} functions in R.
-			\item When parallelizing multiple imputations, mice's built in \textbf{parlmice} function is recommended. It utilizes parLapply under the hood, which results in good performance, but it's easier to use. \textbf{mice.par} should be avoided due to poor performance.
+			\item When parallelizing MI, mice's built in \textbf{parlmice} function is recommended. It utilizes parLapply under the hood, which results in good performance, but it's easier to use. \textbf{mice.par} should be avoided due to poor performance.
 			\item \textbf{parLapply} can be tricky to use inside of functions. \textbf{foreach, furr} and \\ \textbf{future.apply} are good alternatives that only perform marginally worse.
+			\item Parallel backends determine the operating system level utilization of parallel processes. Here, \textbf{FORK} yields better performance on UNIX systems. \textbf{PSOCK} is the default environment and works cross-platform.
 			\item If RAM is an issue, \textbf{disk framing} in conjunction with parallelization is an alternative.
 			\item Running complex workloads on clusters or multi-CPU systems requires a \textbf{MPI} and is a lot more difficult to implement.
 		\end{itemize}
@@ -177,7 +179,7 @@
         \vspace{-1em}
         \begin{footnotesize}
         
-        \printbibliography
+        \printbibliography[heading=none]
         
         \end{footnotesize}
     }
