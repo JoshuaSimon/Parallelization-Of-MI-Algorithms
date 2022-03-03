@@ -145,7 +145,6 @@ custom_color_map <- function(test_mode = "runtime", os_test = FALSE) {
 }
 
 
-
 # Create LaTeX code for a table representation of some data.
 table_to_latex <- function(data, export_filename) {
     print(xtable(data, type = "latex"), file = export_filename)
