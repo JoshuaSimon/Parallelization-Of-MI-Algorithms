@@ -165,7 +165,7 @@
 		\begin{itemize}
 			\itemsep0em
 			\item Parallelization is a powerful technique to reduce the runtime of complex workloads.
-			\item \textbf{parLapply} generally has the best performance, because it not only utilizes parallelization, but also the vectorisation of the \textbf{apply} functions in R.
+			\item \textbf{parLapply} generally has the best performance, because it not only utilizes parallelization, but also the looping in C of the \textbf{lapply} function.
 			\item When parallelizing MI, mice's built in \textbf{parlmice} function is recommended. It utilizes parLapply under the hood, which results in good performance, but it's easier to use. \textbf{mice.par} should be avoided due to poor performance.
 			\item \textbf{parLapply} can be tricky to use inside of functions. \textbf{foreach, furr} and \\ \textbf{future.apply} are good alternatives that only perform marginally worse.
 			\item Parallel backends determine the operating system level utilization of parallel processes. Here, \textbf{FORK} yields better performance on UNIX systems. \textbf{PSOCK} is the default environment and works cross-platform.
