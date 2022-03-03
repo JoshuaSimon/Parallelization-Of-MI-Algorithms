@@ -57,3 +57,4 @@ vignettes/*.pdf
 /poster/*.log
 /poster/*.run.xml
 /poster/*.synctex.gz
+/poster/*.xdv
