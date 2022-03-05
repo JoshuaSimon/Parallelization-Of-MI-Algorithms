@@ -94,6 +94,7 @@ furrr_wrap <- function(data, num_imp, seed, num_cores, backend, n.imp.core = NUL
     }
 }
 
+
 # Wrapper function for a parallel call of mice using the future.apply
 # package and the future_lapply function.
 future_wrap <- function(data, num_imp, seed, num_cores, backend, n.imp.core = NULL) {
@@ -113,6 +114,7 @@ future_wrap <- function(data, num_imp, seed, num_cores, backend, n.imp.core = NU
     return(imp)
   }
 }
+
 
 # Wrapper function for a parallel call of mice using the par.mice
 # function.
