@@ -1,11 +1,11 @@
 # benchmark_core.R
 # ------------------------------------------------ #
-# Calculate multiple impuations for simulated data
+# Calculate multiple imputations for simulated data
 # using the  mice package. Is is done on four ways:
 # 1. Using mice serial
 # 2. Using mice in parallel with foreach
-# 3. Using the mice bulit-in function parlmice
-# 4. Using the micemd paclage and mice.par
+# 3. Using the mice built-in function parlmice
+# 4. Using the micemd package and mice.par
 # The benchmark is performed on different number of
 # CPU cores.
 # ------------------------------------------------ #
@@ -130,7 +130,7 @@ benmark_plot <- function(runtime_data, cores, test_mode = "runtime", os_test = F
     serial_time <- mean(runtime_data$elapsed_time[runtime_data$fun_name == "mice (serial)"])
     runtime_data$elapsed_time[runtime_data$fun_name == "mice (serial)"] <- serial_time
 
-    # Aggregate data from muliple benchmark runs.
+    # Aggregate data from multiple benchmark runs.
     runtime_data_group <- runtime_data %>%
         group_by(fun_name, cores) %>%
         summarize(avg_elapsed_time = mean(elapsed_time),
@@ -162,10 +162,10 @@ benmark_plot <- function(runtime_data, cores, test_mode = "runtime", os_test = F
 }
 
 
-# Retunrs a ggplot object containing a bar chart of the different
+# Returns a ggplot object containing a bar chart of the different
 # CPU times of the MI methods.
 benchmark_plot_cpu_time <- function(runtime_data, num_cores, os_test = FALSE) {
-    # Aggregate data from muliple benchmark runs.
+    # Aggregate data from multiple benchmark runs.
     runtime_data_group <- runtime_data %>%
         group_by(fun_name, cores) %>%
         summarize(
@@ -175,7 +175,7 @@ benchmark_plot_cpu_time <- function(runtime_data, num_cores, os_test = FALSE) {
             avg_speed_up = mean(speed_up, na.rm = TRUE)
             )
 
-    # Transform data shpae to match the input shpae of ggplot's
+    # Transform data shape to match the input shape of ggplot's
     # barplots better.
     bar_data <- runtime_data_group %>%
         select(fun_name, cores, avg_elapsed_time) %>%
@@ -213,7 +213,7 @@ benchmark_plot_cpu_time <- function(runtime_data, num_cores, os_test = FALSE) {
 
 main <- function() {
     # Check for the OS type of the machine and choose
-    # a suitiable benchmark run. On Linux and MacOS
+    # a suitable benchmark run. On Linux and MacOS
     # different parallel backends are compared.
     os_name <- Sys.info()[["sysname"]]
     if (os_name == "Windows") {
@@ -233,7 +233,7 @@ main <- function() {
     total_imputations <- 128
     total_bechmark_runs <- 10
 
-    # Run the benmark.
+    # Run the benchmark.
     runtime_data <- benmark_imputation(
         data = data, num_imp = total_imputations,
         cores = cores, runs = total_bechmark_runs,

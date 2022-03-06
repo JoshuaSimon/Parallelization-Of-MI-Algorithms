@@ -38,7 +38,7 @@ assert_output <- function(mids_object, num_imp) {
 
 # Timer function to measure the runtime of mice calls from
 # different mice wrapper functions. This function also
-# assserts the output produced by the mice calls. The runtime
+# asserts the output produced by the mice calls. The runtime
 # in seconds is returned as a single value (method = "simple")
 # or as a proc_time object containing user, system and elapsed
 # time (method = "verbose").

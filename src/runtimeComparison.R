@@ -94,12 +94,3 @@ ggplot(times, aes(fill = measures, y = time, x = method,
   ggtitle("Comparing runtime of different parallelization methods in R
           using mice and m = 48 imputations") +
   ylab("Runtime in seconds") + xlab("Method / Package")
-
-
-
-
-
-
-
-
-

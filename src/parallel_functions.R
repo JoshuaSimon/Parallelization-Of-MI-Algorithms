@@ -29,7 +29,7 @@ parlmice_wrap <- function(data, m, cluster.seed, n.core, cl.type, n.imp.core) {
 
 # Implementation for a parallel mice call using the foreach
 # parallel loop. Here, the loop size is matched to the number of CPU cores.
-# The number of imputations is then equally distributed to the threds.
+# The number of imputations is then equally distributed to the threads.
 foreach_wrap <- function(data, num_imp, seed, num_cores, backend, n.imp.core = NULL) {
     cl <- makeCluster(num_cores, type = backend)
     clusterSetRNGStream(cl, seed)

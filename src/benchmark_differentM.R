@@ -48,7 +48,7 @@ for (i in 1:10){
                                                  m = m,
                                                  cluster.seed = seed,
                                                  n.core = nCores,
-                                                 n.imp.core = m/nCores,
+                                                 n.imp.core = m / nCores,
                                                  cl.type = "PSOCK")))
     # micemd / mice.par
     miceParTimes <- c(miceParTimes,
@@ -57,7 +57,7 @@ for (i in 1:10){
                                               seed = seed, 
                                               num_cores = detectCores(), 
                                               backend = "PSOCK", 
-                                              n.imp.core = m/nCores)))
+                                              n.imp.core = m / nCores)))
     # foreach
     foreachTimes <- c(foreachTimes,
                       system.time(foreach_wrap(data = dat,
@@ -124,12 +124,12 @@ for (i in 1:10){
   
   # create df for speedup
   impSpeedup <- data.frame(
-    Speedup = c(runtimeMice/runtimeParlmice,
-                runtimeMice/runtimeMicePar,
-                runtimeMice/runtimeForeach,
-                runtimeMice/runtimeParlapply,
-                runtimeMice/runtimeFurrr,
-                runtimeMice/runTimeFuture),
+    Speedup = c(runtimeMice / runtimeParlmice,
+                runtimeMice / runtimeMicePar,
+                runtimeMice / runtimeForeach,
+                runtimeMice / runtimeParlapply,
+                runtimeMice / runtimeFurrr,
+                runtimeMice / runTimeFuture),
     M = c(rep(imputations, 6)),
     Method = c(rep("parlmice", 9), rep("mice.par", 9),
                rep("foreach", 9), rep("parLapply", 9),
