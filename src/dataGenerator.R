@@ -35,7 +35,7 @@ dataGenerator <- function(n = 10000){
   mis_x9 <- sample(1:n, 0.15 * n, replace = FALSE)
   mis_x10 <- sample(1:n, 0.5 * n, replace = FALSE)
   
-  # Introducting NAs / missing values into the dataframe
+  # Introducing NAs / missing values into the dataframe
   dat[mis_x3, 3] <- NA
   dat[mis_x4, 4] <- NA
   dat[mis_x7, 7] <- NA
