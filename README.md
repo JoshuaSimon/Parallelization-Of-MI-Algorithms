@@ -22,3 +22,11 @@ The `src/C++/` directory contatins the C++ source code and the R code for a comp
 
 ### Examples
 The `src/examples` directory contains explorative code to get familiar with the topic.
+
+## Result Data
+
+We also provided the `.RData` files for the benchmark results in case you don't want to run the whole benchmark on your own system. This files are located in the `/data` folder. 
+
+## Documentation and Help
+
+In the `/docs` folder we provided a guide to set up Linux Ubuntu and R under WSL on a windows machine. If you want to run the FORK variants of the parallel algorithms you need a Unix operating system. The rest is just fine on a windows system.

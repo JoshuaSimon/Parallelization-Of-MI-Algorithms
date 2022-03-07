@@ -1,11 +1,9 @@
 # benchmark_core.R
 # ------------------------------------------------ #
 # Calculate multiple imputations for simulated data
-# using the  mice package. Is is done on four ways:
-# 1. Using mice serial
-# 2. Using mice in parallel with foreach
-# 3. Using the mice built-in function parlmice
-# 4. Using the micemd package and mice.par
+# using the  mice package. Is is done in a few ways
+# to check different parallel implementations of
+# mice.
 # The benchmark is performed on different number of
 # CPU cores.
 # ------------------------------------------------ #
